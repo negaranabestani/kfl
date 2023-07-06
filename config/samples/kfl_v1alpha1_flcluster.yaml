@@ -1,0 +1,12 @@
+apiVersion: kfl.aut.tech/v1alpha1
+kind: FLCluster
+metadata:
+  labels:
+    app.kubernetes.io/name: flcluster
+    app.kubernetes.io/instance: flcluster-sample
+    app.kubernetes.io/part-of: kfl
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: kfl
+  name: flcluster-sample
+spec:
+  # TODO(user): Add fields here

@@ -1,0 +1,31 @@
+# permissions for end users to edit flclusters.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: flcluster-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: kfl
+    app.kubernetes.io/part-of: kfl
+    app.kubernetes.io/managed-by: kustomize
+  name: flcluster-editor-role
+rules:
+- apiGroups:
+  - kfl.aut.tech
+  resources:
+  - flclusters
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - kfl.aut.tech
+  resources:
+  - flclusters/status
+  verbs:
+  - get
