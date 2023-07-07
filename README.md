@@ -1,9 +1,10 @@
 # kfl
 > Supervisor: [Dr. Mahmoud Momtazpour](https://scholar.google.co.za/citations?user=uwozfWkAAAAJ&hl=en)
-// TODO(user): Add simple overview of use/purpose
+> This project is developed to make configuration and management of Federated Learning clusters on Kubernetes, easier.
 
 ## Description
-// TODO(user): An in-depth paragraph about your project and overview of use
+Federeted Learning is a new distributed machine learning approach. So multiple parties contribute together to build up a machine learning model in a distributed manner. kfl operationalizes the configuration of FL clusters, and management of FL tasks on Kubernetes. 
+// TODO(user): description of FL enabler project
 
 ## Getting Started
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
