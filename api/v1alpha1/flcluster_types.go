@@ -48,6 +48,11 @@ type FLCluster struct {
 
 	Spec   FLClusterSpec   `json:"spec,omitempty"`
 	Status FLClusterStatus `json:"status,omitempty"`
+
+	edgeServerNumber int
+	clientNumber     int
+	dataset          string
+	modelName        string
 }
 
 //+kubebuilder:object:root=true
