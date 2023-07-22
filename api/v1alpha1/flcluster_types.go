@@ -29,10 +29,10 @@ type FLClusterSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	Server     Device `json:"server"`
-	EdgeServer Device `json:"edgeServer"`
-	EdgeClient Device `json:"edgeClient"`
+	EdgeServer Device `json:"edge-server"`
+	EdgeClient Device `json:"edge-client"`
 	Dataset    string `json:"dataset"`
-	ModelName  string `json:"modelName"`
+	ModelName  string `json:"model-name"`
 }
 
 const (
@@ -49,22 +49,20 @@ type Device struct {
 }
 
 type LocalTrainingData struct {
-	EdgeClient        Device `json:"edge_client"`
-	EdgeServer        Device `json:"edgeServer"`
-	LocalTrainingTime int64  `json:"local_training_time"`
-	LocalRounds       int    `json:"local_rounds"`
+	EdgeClient        Device `json:"edge-client"`
+	EdgeServer        Device `json:"edge-server"`
+	LocalTrainingTime int64  `json:"local-training-time"`
+	LocalRounds       int    `json:"local-rounds"`
 }
 
 // FLClusterStatus defines the observed state of FLCluster
 type FLClusterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	GlobalTrainingTime int64               `json:"global_training_time"`
-	GlobalRounds       int                 `json:"globalRounds"`
-	GlobalAccuracy     float64             `json:"globalAccuracy"`
-	LocalTrainings     []LocalTrainingData `json:"localTrainings"`
-	Dataset            string              `json:"dataset"`
-	ModelName          string              `json:"modelName"`
+	GlobalTrainingTime int64               `json:"global-training-time"`
+	GlobalRounds       int                 `json:"global-rounds"`
+	GlobalAccuracy     float64             `json:"global-accuracy"`
+	LocalTrainings     []LocalTrainingData `json:"local-trainings"`
 }
 
 //+kubebuilder:object:root=true
