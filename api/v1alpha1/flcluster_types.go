@@ -35,17 +35,11 @@ type FLClusterSpec struct {
 	ModelName  string `json:"model-name"`
 }
 
-const (
-	EdgeClient = "edge-client"
-	EdgeServer = "edge-server"
-	Server     = "server"
-)
 
 type Device struct {
 	Replica int    `json:"replica"`
 	Memory  string `json:"memory"`
 	Cpu     string `json:"cpu"`
-	Type    string `json:"type"`
 }
 
 type LocalTrainingData struct {
