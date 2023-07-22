@@ -28,13 +28,12 @@ type FLClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	Server     Device `json:"server"`
-	EdgeServer Device `json:"edge-server"`
-	EdgeClient Device `json:"edge-client"`
-	Dataset    string `json:"dataset"`
-	ModelName  string `json:"model-name"`
+	CentralServer Device `json:"central-server"`
+	EdgeServer    Device `json:"edge-server"`
+	EdgeClient    Device `json:"edge-client"`
+	Dataset       string `json:"dataset"`
+	ModelName     string `json:"model-name"`
 }
-
 
 type Device struct {
 	Replica int    `json:"replica"`
