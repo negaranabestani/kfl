@@ -28,14 +28,34 @@ type FLClusterSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of FLCluster. Edit flcluster_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	CentralServer Device `json:"central-server"`
+	EdgeServer    Device `json:"edge-server"`
+	EdgeClient    Device `json:"edge-client"`
+	Dataset       string `json:"dataset"`
+	ModelName     string `json:"model-name"`
+}
+
+type Device struct {
+	Replica int    `json:"replica"`
+	Memory  string `json:"memory"`
+	Cpu     string `json:"cpu"`
+}
+
+type LocalTrainingData struct {
+	EdgeClient        Device `json:"edge-client"`
+	EdgeServer        Device `json:"edge-server"`
+	LocalTrainingTime int64  `json:"local-training-time"`
+	LocalRounds       int    `json:"local-rounds"`
 }
 
 // FLClusterStatus defines the observed state of FLCluster
 type FLClusterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	GlobalTrainingTime int64               `json:"global-training-time"`
+	GlobalRounds       int                 `json:"global-rounds"`
+	GlobalAccuracy     float64             `json:"global-accuracy"`
+	LocalTrainings     []LocalTrainingData `json:"local-trainings"`
 }
 
 //+kubebuilder:object:root=true
