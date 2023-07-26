@@ -18,7 +18,7 @@ package main
 
 import (
 	"flag"
-	"github.com/negaranabestani/kfl/controller"
+	"github.com/negaranabestani/kfl/internal/controller"
 	"os"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
