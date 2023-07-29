@@ -36,11 +36,13 @@ type FLClusterSpec struct {
 }
 
 type Device struct {
-	Replica int32  `json:"replica"`
-	Memory  string `json:"memory"`
-	Cpu     string `json:"cpu"`
+	Replica   int32     `json:"replica"`
+	Resources Resources `json:"resources"`
 }
-
+type Resources struct {
+	Memory string `json:"memory"`
+	Cpu    string `json:"cpu"`
+}
 type LocalTrainingData struct {
 	EdgeClient        Device `json:"edge-client"`
 	EdgeServer        Device `json:"edge-server"`

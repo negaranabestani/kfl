@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"github.com/negaranabestani/kfl/api/v1alpha1"
+	utils "github.com/negaranabestani/kfl/util"
 	"github.com/negaranabestani/kfl/values"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -20,12 +21,13 @@ func (r *FLClusterReconciler) deleteCentralServer(ctx context.Context, cluster v
 }
 
 func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
+	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "central-server-deployment",
 		},
 		Spec: appsv1.DeploymentSpec{
-			Replicas: &cluster.Spec.CentralServer.Replica,
+			Replicas: utils.Int32ptr(cluster.Spec.CentralServer.Replica),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"app": values.CentralServerSelectorApp,
@@ -48,24 +50,7 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 									ContainerPort: values.CentralServerContainerPort,
 								},
 							},
-							Resources: corev1.ResourceRequirements{
-								Limits: corev1.ResourceList{
-									corev1.ResourceMemory: {
-										//	TODO set memory
-									},
-									corev1.ResourceCPU: {
-										//	TODO set cpu
-									},
-								},
-								Requests: corev1.ResourceList{
-									corev1.ResourceMemory: {
-										//	TODO set memory
-									},
-									corev1.ResourceCPU: {
-										//	TODO set cpu
-									},
-								},
-							},
+							Resources: *resources,
 						},
 					},
 				},
