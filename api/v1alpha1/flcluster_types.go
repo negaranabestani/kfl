@@ -36,7 +36,7 @@ type FLClusterSpec struct {
 }
 
 type Device struct {
-	Replica int    `json:"replica"`
+	Replica int32  `json:"replica"`
 	Memory  string `json:"memory"`
 	Cpu     string `json:"cpu"`
 }
