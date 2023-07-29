@@ -30,7 +30,7 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "central-server-deployment",
+			Name: cluster.Name + "-central-server-deployment",
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: utils.Int32ptr(cluster.Spec.CentralServer.Replica),
