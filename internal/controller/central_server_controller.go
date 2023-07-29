@@ -3,11 +3,17 @@ package controller
 import (
 	"context"
 	"github.com/negaranabestani/kfl/api/v1alpha1"
-	utils "github.com/negaranabestani/kfl/util"
-	"github.com/negaranabestani/kfl/values"
+	utils "github.com/negaranabestani/kfl/internal/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+)
+
+const (
+	CentralServerSelectorApp       = "central-server"
+	CentralServerImage             = "kennethreitz/httpbin"
+	CentralServerContainerPort     = 8080
+	CentralServerContainerPortName = "httpbin"
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster v1alpha1.FLCluster) error {
@@ -30,24 +36,24 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 			Replicas: utils.Int32ptr(cluster.Spec.CentralServer.Replica),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": values.CentralServerSelectorApp,
+					"app": CentralServerSelectorApp,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": values.CentralServerSelectorApp,
+						"app": CentralServerSelectorApp,
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
 							Name:  "central-server-container",
-							Image: values.CentralServerImage,
+							Image: CentralServerImage,
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          values.CentralServerContainerPortName,
-									ContainerPort: values.CentralServerContainerPort,
+									Name:          CentralServerContainerPortName,
+									ContainerPort: CentralServerContainerPort,
 								},
 							},
 							Resources: *resources,
