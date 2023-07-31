@@ -34,26 +34,29 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 			Name:      cluster.Name + "-central-server-deployment",
 			Namespace: cluster.Namespace,
 			Labels: map[string]string{
-				"app": CentralServerSelectorApp,
+				"cluster": cluster.Name,
+				"app":     CentralServerSelectorApp,
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: utils.Int32ptr(cluster.Spec.CentralServer.Replica),
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
-					"app": CentralServerSelectorApp,
+					"cluster": cluster.Name,
+					"app":     CentralServerSelectorApp,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
-						"app": CentralServerSelectorApp,
+						"cluster": cluster.Name,
+						"app":     CentralServerSelectorApp,
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  "central-server-container",
+							Name:  cluster.Name + "-central-server-container",
 							Image: CentralServerImage,
 							Ports: []corev1.ContainerPort{
 								{
