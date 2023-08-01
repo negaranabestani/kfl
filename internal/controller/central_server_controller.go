@@ -76,3 +76,7 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 	}
 	return dep, nil
 }
+
+func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCluster) (*corev1.Service, error) {
+	return nil, nil
+}
