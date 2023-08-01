@@ -7,6 +7,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -15,6 +16,7 @@ const (
 	CentralServerImage             = "kennethreitz/httpbin"
 	CentralServerContainerPort     = 8080
 	CentralServerContainerPortName = "httpbin"
+	centralServerServicePort       = 8080
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster v1alpha1.FLCluster) error {
@@ -78,5 +80,34 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 }
 
 func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCluster) (*corev1.Service, error) {
-	return nil, nil
+	service := &corev1.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: cluster.Namespace,
+			Name:      cluster.Name + "-central-server-service",
+			Labels: map[string]string{
+				"cluster": cluster.Name,
+				"app":     CentralServerSelectorApp,
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Ports: []corev1.ServicePort{
+				{
+					Name:       "default",
+					Port:       int32(centralServerServicePort),
+					TargetPort: intstr.FromString("default"),
+				},
+			},
+			ClusterIP: corev1.ClusterIPNone,
+			Selector: map[string]string{
+				"cluster": cluster.Name,
+				"app":     CentralServerSelectorApp,
+			},
+		},
+	}
+
+	if err := ctrl.SetControllerReference(cluster, service, r.Scheme); err != nil {
+		return service, err
+	}
+
+	return service, nil
 }
