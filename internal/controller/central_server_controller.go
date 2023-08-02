@@ -6,6 +6,7 @@ import (
 	utils "github.com/negaranabestani/kfl/internal/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -112,9 +113,13 @@ func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCl
 }
 
 func (r *FLClusterReconciler) centralServerDesiredPVC(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolumeClaim, error) {
-	pvc := corev1.PersistentVolumeClaim{
+	storage, err := resource.ParseQuantity("100Gi")
+	if err != nil {
+		return nil, err
+	}
+	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: flCluster.Name + "-pvc",
+			Name: cluster.Name + "-pvc",
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			AccessModes: []corev1.PersistentVolumeAccessMode{
@@ -128,5 +133,6 @@ func (r *FLClusterReconciler) centralServerDesiredPVC(cluster *v1alpha1.FLCluste
 			},
 		},
 	}
-	return nil, nil
+
+	return pvc, nil
 }
