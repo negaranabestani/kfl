@@ -97,7 +97,6 @@ func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCl
 					TargetPort: intstr.FromString("default"),
 				},
 			},
-			ClusterIP: corev1.ClusterIPNone,
 			Selector: map[string]string{
 				"cluster": cluster.Name,
 				"app":     CentralServerSelectorApp,
