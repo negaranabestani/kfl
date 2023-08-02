@@ -18,6 +18,7 @@ const (
 	CentralServerContainerPort     = 8080
 	CentralServerContainerPortName = "httpbin"
 	centralServerServicePort       = 8080
+	centralServerMountPath         = "/results"
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster v1alpha1.FLCluster) error {
@@ -32,6 +33,10 @@ func (r *FLClusterReconciler) deleteCentralServer(ctx context.Context, cluster v
 
 func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
 	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
+	pvc, err := r.centralServerDesiredPVC(cluster)
+	if err != nil {
+		return nil, err
+	}
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cluster.Name + "-central-server-deployment",
@@ -68,6 +73,22 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 								},
 							},
 							Resources: *resources,
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									MountPath: centralServerMountPath,
+									Name:      cluster.Name + "-volume-data",
+								},
+							},
+						},
+					},
+					Volumes: []corev1.Volume{
+						{
+							Name: cluster.Name + "-volume-data",
+							VolumeSource: corev1.VolumeSource{
+								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
+									ClaimName: pvc.Name,
+								},
+							},
 						},
 					},
 				},

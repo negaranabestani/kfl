@@ -47,6 +47,7 @@ func DesiredDeploymentTest(t *testing.T) {
 		"app":     CentralServerSelectorApp,
 	}
 	expectedContainerName := flCluster.Name + "-central-server-container"
+	expectedVolumeMountName := flCluster.Name + "-volume-data"
 	deployment, err := r.centralServerDesiredDeployment(flCluster)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, deployment.Name)
@@ -56,6 +57,8 @@ func DesiredDeploymentTest(t *testing.T) {
 	assert.Equal(t, expectedLabels, deployment.Spec.Selector)
 	assert.Equal(t, expectedLabels, deployment.Spec.Template.Labels)
 	assert.Equal(t, expectedContainerName, deployment.Spec.Template.Spec.Containers[0].Name)
+	assert.Equal(t, expectedVolumeMountName, deployment.Spec.Template.Spec.Containers[0].VolumeMounts[0].Name)
+	assert.Equal(t, expectedVolumeMountName, deployment.Spec.Template.Spec.Volumes[0].Name)
 
 	if *deployment.Spec.Replicas != 1 {
 		t.Errorf("expected 1 central server deployment replica go %d", *deployment.Spec.Replicas)
