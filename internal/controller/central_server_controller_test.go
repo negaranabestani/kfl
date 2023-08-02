@@ -103,3 +103,36 @@ func DesiredServiceTest(t *testing.T) {
 	assert.Equal(t, expectedLabels, service.Labels)
 	assert.Equal(t, expectedLabels, service.Spec.Selector)
 }
+
+func DesiredPVC(t *testing.T) {
+	scheme := runtime.NewScheme()
+	_ = corev1.AddToScheme(scheme)
+	_ = appsv1.AddToScheme(scheme)
+	_ = v1alpha1.AddToScheme(scheme)
+
+	flCluster := &v1alpha1.FLCluster{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-fl",
+			Namespace: "default",
+		},
+		Spec: v1alpha1.FLClusterSpec{
+			CentralServer: v1alpha1.Device{
+				Replica: 1,
+				Resources: v1alpha1.Resources{
+					Cpu:    "1000m",
+					Memory: "128Mi",
+				},
+			},
+		},
+	}
+	r := &FLClusterReconciler{
+		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
+		Scheme: scheme,
+	}
+
+	expectedName := flCluster.Name + "-pvc"
+	pvc, err := r.centralServerDesiredPVC(flCluster)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedName, pvc.Name)
+
+}

@@ -110,3 +110,23 @@ func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCl
 
 	return service, nil
 }
+
+func (r *FLClusterReconciler) centralServerDesiredPVC(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolumeClaim, error) {
+	pvc := corev1.PersistentVolumeClaim{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: flCluster.Name + "-pvc",
+		},
+		Spec: corev1.PersistentVolumeClaimSpec{
+			AccessModes: []corev1.PersistentVolumeAccessMode{
+				"ReadWriteOnce",
+			},
+			Resources: corev1.ResourceRequirements{
+				Limits: nil,
+				Requests: corev1.ResourceList{
+					corev1.ResourceStorage: storage,
+				},
+			},
+		},
+	}
+	return nil, nil
+}
