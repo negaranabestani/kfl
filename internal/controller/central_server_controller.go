@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	CentralServerSelectorApp       = "central-server"
+	CentralServer                  = "central-server"
 	CentralServerImage             = "kennethreitz/httpbin"
 	CentralServerContainerPort     = 8080
 	CentralServerContainerPortName = "httpbin"
@@ -31,11 +31,11 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cluster.Name + "-central-server-deployment",
+			Name:      cluster.Name + "-" + CentralServer,
 			Namespace: cluster.Namespace,
 			Labels: map[string]string{
 				"cluster": cluster.Name,
-				"app":     CentralServerSelectorApp,
+				"app":     CentralServer,
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -43,20 +43,20 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"cluster": cluster.Name,
-					"app":     CentralServerSelectorApp,
+					"app":     CentralServer,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
 						"cluster": cluster.Name,
-						"app":     CentralServerSelectorApp,
+						"app":     CentralServer,
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  cluster.Name + "-central-server-container",
+							Name:  cluster.Name + "-" + CentralServer,
 							Image: CentralServerImage,
 							Ports: []corev1.ContainerPort{
 								{

@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func DesiredCentralServerDeploymentTest(t *testing.T) {
+func DesiredEdgeClientDeploymentTest(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = corev1.AddToScheme(scheme)
 	_ = appsv1.AddToScheme(scheme)
@@ -26,8 +26,8 @@ func DesiredCentralServerDeploymentTest(t *testing.T) {
 			CentralServer: v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
-					Cpu:    "1000m",
-					Memory: "128Mi",
+					Cpu:    "1",
+					Memory: "5Gi",
 				},
 			},
 		},
@@ -36,18 +36,18 @@ func DesiredCentralServerDeploymentTest(t *testing.T) {
 		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
 		Scheme: scheme,
 	}
-	expectedName := flCluster.Name + "-central-server"
+	expectedName := flCluster.Name + "-" + EdgeClient
 	expectedNamespace := flCluster.Namespace
 	expectedResource := v1alpha1.Resources{
-		Cpu:    "1000m",
-		Memory: "128Mi",
+		Cpu:    "1",
+		Memory: "5Gi",
 	}
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
-		"app":     CentralServerSelectorApp,
+		"app":     EdgeClient,
 	}
-	expectedContainerName := flCluster.Name + "-central-server"
-	deployment, err := r.centralServerDesiredDeployment(flCluster)
+	expectedContainerName := flCluster.Name + "-central-server-container"
+	deployment, err := r.desiredEdgeClientDeployment(flCluster)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, deployment.Name)
 	assert.Equal(t, expectedNamespace, deployment.Namespace)
