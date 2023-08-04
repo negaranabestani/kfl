@@ -36,7 +36,7 @@ func DesiredCentralServerDeploymentTest(t *testing.T) {
 		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
 		Scheme: scheme,
 	}
-	expectedName := flCluster.Name + "-central-server"
+	expectedName := flCluster.Name + "-" + CentralServer
 	expectedNamespace := flCluster.Namespace
 	expectedResource := v1alpha1.Resources{
 		Cpu:    "1000m",
@@ -44,9 +44,9 @@ func DesiredCentralServerDeploymentTest(t *testing.T) {
 	}
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
-		"app":     CentralServerSelectorApp,
+		"app":     CentralServer,
 	}
-	expectedContainerName := flCluster.Name + "-central-server"
+	expectedContainerName := flCluster.Name + "-" + CentralServer
 	deployment, err := r.centralServerDesiredDeployment(flCluster)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, deployment.Name)
