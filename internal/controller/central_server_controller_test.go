@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func DesiredDeploymentTest(t *testing.T) {
+func CentralServerDesiredDeploymentTest(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = corev1.AddToScheme(scheme)
 	_ = appsv1.AddToScheme(scheme)
@@ -65,7 +65,7 @@ func DesiredDeploymentTest(t *testing.T) {
 	}
 }
 
-func DesiredServiceTest(t *testing.T) {
+func CentralServerDesiredServiceTest(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = corev1.AddToScheme(scheme)
 	_ = appsv1.AddToScheme(scheme)
@@ -107,7 +107,7 @@ func DesiredServiceTest(t *testing.T) {
 	assert.Equal(t, expectedLabels, service.Spec.Selector)
 }
 
-func DesiredPVC(t *testing.T) {
+func CentralServerDesiredPVCTest(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = corev1.AddToScheme(scheme)
 	_ = appsv1.AddToScheme(scheme)
