@@ -39,7 +39,7 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 	}
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cluster.Name + "-central-server-deployment",
+			Name:      cluster.Name + "-central-server",
 			Namespace: cluster.Namespace,
 			Labels: map[string]string{
 				"cluster": cluster.Name,
@@ -64,7 +64,7 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  cluster.Name + "-central-server-container",
+							Name:  cluster.Name + "-central-server",
 							Image: CentralServerImage,
 							Ports: []corev1.ContainerPort{
 								{
@@ -76,14 +76,14 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 							VolumeMounts: []corev1.VolumeMount{
 								{
 									MountPath: centralServerMountPath,
-									Name:      cluster.Name + "-volume-data",
+									Name:      cluster.Name + "-data",
 								},
 							},
 						},
 					},
 					Volumes: []corev1.Volume{
 						{
-							Name: cluster.Name + "-volume-data",
+							Name: cluster.Name + "-data",
 							VolumeSource: corev1.VolumeSource{
 								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
 									ClaimName: pvc.Name,
@@ -105,7 +105,7 @@ func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCl
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: cluster.Namespace,
-			Name:      cluster.Name + "-central-server-service",
+			Name:      cluster.Name + "-central-server",
 			Labels: map[string]string{
 				"cluster": cluster.Name,
 				"app":     CentralServerSelectorApp,
@@ -140,7 +140,7 @@ func (r *FLClusterReconciler) centralServerDesiredPVC(cluster *v1alpha1.FLCluste
 	}
 	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: cluster.Name + "-pvc",
+			Name: cluster.Name + "-central-server",
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			AccessModes: []corev1.PersistentVolumeAccessMode{
