@@ -36,7 +36,7 @@ func DesiredDeploymentTest(t *testing.T) {
 		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
 		Scheme: scheme,
 	}
-	expectedName := flCluster.Name + "-central-server-deployment"
+	expectedName := flCluster.Name + "-central-server"
 	expectedNamespace := flCluster.Namespace
 	expectedResource := v1alpha1.Resources{
 		Cpu:    "1000m",
@@ -46,8 +46,8 @@ func DesiredDeploymentTest(t *testing.T) {
 		"cluster": flCluster.Name,
 		"app":     CentralServerSelectorApp,
 	}
-	expectedContainerName := flCluster.Name + "-central-server-container"
-	expectedVolumeMountName := flCluster.Name + "-volume-data"
+	expectedContainerName := flCluster.Name + "-central-server"
+	expectedVolumeMountName := flCluster.Name + "-data"
 	deployment, err := r.centralServerDesiredDeployment(flCluster)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, deployment.Name)
@@ -91,7 +91,7 @@ func DesiredServiceTest(t *testing.T) {
 		Scheme: scheme,
 	}
 
-	expectedName := flCluster.Name + "-central-server-service"
+	expectedName := flCluster.Name + "-central-server"
 	expectedNamespace := flCluster.Namespace
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
@@ -133,7 +133,7 @@ func DesiredPVC(t *testing.T) {
 		Scheme: scheme,
 	}
 
-	expectedName := flCluster.Name + "-pvc"
+	expectedName := flCluster.Name + "-central-server"
 	pvc, err := r.centralServerDesiredPVC(flCluster)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, pvc.Name)
