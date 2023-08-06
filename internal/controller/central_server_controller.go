@@ -134,7 +134,7 @@ func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCl
 }
 
 func (r *FLClusterReconciler) centralServerDesiredPVC(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolumeClaim, error) {
-	storage, err := resource.ParseQuantity("100Gi")
+	storage, err := resource.ParseQuantity("1M")
 	if err != nil {
 		return nil, err
 	}
