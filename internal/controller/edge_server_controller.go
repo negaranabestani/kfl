@@ -17,7 +17,7 @@ import (
 const (
 	edgeServer                  = "edge-server"
 	edgeServerSelectorApp       = "edge-server"
-	edgeServerImage             = ""
+	edgeServerImage             = "kennethreitz/httpbin"
 	edgeServerContainerPort     = 8080
 	edgeServerContainerPortName = "httpbin"
 	edgeServerServicePort       = 8080
