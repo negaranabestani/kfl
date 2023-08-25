@@ -18,8 +18,9 @@ package main
 
 import (
 	"flag"
-	"github.com/negaranabestani/kfl/internal/controller"
 	"os"
+
+	"github.com/negaranabestani/kfl/internal/controller"
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
@@ -94,6 +95,10 @@ func main() {
 		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "FLCluster")
+		os.Exit(1)
+	}
+	if err = (&kflv1alpha1.FLCluster{}).SetupWebhookWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create webhook", "webhook", "FLCluster")
 		os.Exit(1)
 	}
 	//+kubebuilder:scaffold:builder
