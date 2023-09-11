@@ -19,9 +19,9 @@ const (
 	CentralServer                  = "central-server"
 	CentralServerSelectorApp       = "central-server"
 	CentralServerImage             = "kennethreitz/httpbin"
-	CentralServerContainerPort     = 8080
+	CentralServerContainerPort     = 9000
 	CentralServerContainerPortName = "httpbin"
-	centralServerServicePort       = 8080
+	centralServerServicePort       = 9000
 	centralServerMountPath         = "/results"
 )
 

@@ -18,9 +18,9 @@ const (
 	edgeServer                  = "edge-server"
 	edgeServerSelectorApp       = "edge-server"
 	edgeServerImage             = "kennethreitz/httpbin"
-	edgeServerContainerPort     = 8080
+	edgeServerContainerPort     = 9002
 	edgeServerContainerPortName = "httpbin"
-	edgeServerServicePort       = 8080
+	edgeServerServicePort       = 9002
 )
 
 func (r *FLClusterReconciler) createOrUpdateEdgeServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {

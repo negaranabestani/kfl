@@ -18,9 +18,9 @@ const (
 	EdgeClient                  = "edge-client"
 	EdgeClientSelectorApp       = "edge-client"
 	EdgeClientImage             = "something"
-	EdgeClientContainerPort     = 8080
+	EdgeClientContainerPort     = 9001
 	EdgeClientContainerPortName = "httpbin"
-	EdgeClientServicePort       = 8080
+	EdgeClientServicePort       = 9001
 )
 
 func (r *FLClusterReconciler) createOrUpdateEdgeClient(ctx context.Context, cluster *v1alpha1.FLCluster) error {
@@ -113,7 +113,7 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          "http",
-									ContainerPort: 8080,
+									ContainerPort: EdgeClientContainerPort,
 								},
 							},
 							Resources: *resources,
@@ -144,7 +144,7 @@ func (r *FLClusterReconciler) desiredEdgeClientService(cluster *v1alpha1.FLClust
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",
-					Port:       int32(EdgeClientServicePort),
+					Port:       EdgeClientServicePort,
 					TargetPort: intstr.FromString("default"),
 				},
 			},
