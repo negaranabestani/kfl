@@ -16,6 +16,7 @@ import (
 )
 
 const (
+	CentralServer                  = "central-server"
 	CentralServerSelectorApp       = "central-server"
 	CentralServerImage             = "kennethreitz/httpbin"
 	CentralServerContainerPort     = 8080
@@ -25,8 +26,8 @@ const (
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
-	desiredDep, er2 := r.centralServerDesiredDeployment(cluster)
-	desiredService, er1 := r.centralServerDesiredService(cluster)
+	desiredDep, er2 := r.desiredCentralServerDeployment(cluster)
+	desiredService, er1 := r.desiredEdgeClientService(cluster)
 	if er1 != nil {
 		return er1
 	}
@@ -79,19 +80,19 @@ func (r *FLClusterReconciler) deleteCentralServer(ctx context.Context, cluster v
 	return nil
 }
 
-func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
+func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
 	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
-	pvc, err := r.centralServerDesiredPVC(cluster)
+	pvc, err := r.desiredCentralServerPVC(cluster)
 	if err != nil {
 		return nil, err
 	}
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cluster.Name + "-central-server",
+			Name:      cluster.Name + "-" + CentralServer,
 			Namespace: cluster.Namespace,
 			Labels: map[string]string{
 				"cluster": cluster.Name,
-				"app":     CentralServerSelectorApp,
+				"app":     CentralServer,
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -99,20 +100,20 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 			Selector: &metav1.LabelSelector{
 				MatchLabels: map[string]string{
 					"cluster": cluster.Name,
-					"app":     CentralServerSelectorApp,
+					"app":     CentralServer,
 				},
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
 					Labels: map[string]string{
 						"cluster": cluster.Name,
-						"app":     CentralServerSelectorApp,
+						"app":     CentralServer,
 					},
 				},
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  cluster.Name + "-central-server",
+							Name:  cluster.Name + "-" + CentralServer,
 							Image: CentralServerImage,
 							Ports: []corev1.ContainerPort{
 								{
@@ -149,11 +150,11 @@ func (r *FLClusterReconciler) centralServerDesiredDeployment(cluster *v1alpha1.F
 	return dep, nil
 }
 
-func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCluster) (*corev1.Service, error) {
+func (r *FLClusterReconciler) desiredCentralServerService(cluster *v1alpha1.FLCluster) (*corev1.Service, error) {
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: cluster.Namespace,
-			Name:      cluster.Name + "-central-server",
+			Name:      cluster.Name + "-" + CentralServer,
 			Labels: map[string]string{
 				"cluster": cluster.Name,
 				"app":     CentralServerSelectorApp,
@@ -181,14 +182,14 @@ func (r *FLClusterReconciler) centralServerDesiredService(cluster *v1alpha1.FLCl
 	return service, nil
 }
 
-func (r *FLClusterReconciler) centralServerDesiredPVC(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolumeClaim, error) {
+func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolumeClaim, error) {
 	storage, err := resource.ParseQuantity("1M")
 	if err != nil {
 		return nil, err
 	}
 	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: cluster.Name + "-central-server",
+			Name: cluster.Name + "-" + CentralServer,
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			AccessModes: []corev1.PersistentVolumeAccessMode{
