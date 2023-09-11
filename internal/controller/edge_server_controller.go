@@ -132,7 +132,7 @@ func (r *FLClusterReconciler) edgeServerDesiredService(cluster *v1alpha1.FLClust
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: cluster.Namespace,
-			Name:      cluster.Name + "-central-server",
+			Name:      cluster.Name + "-" + edgeServer,
 			Labels: map[string]string{
 				"cluster": cluster.Name,
 				"app":     edgeServerSelectorApp,
