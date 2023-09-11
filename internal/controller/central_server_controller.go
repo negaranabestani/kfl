@@ -27,7 +27,7 @@ const (
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
 	desiredDep, er2 := r.desiredCentralServerDeployment(cluster)
-	desiredService, er1 := r.desiredEdgeClientService(cluster)
+	desiredService, er1 := r.desiredCentralServerService(cluster)
 	if er1 != nil {
 		return er1
 	}

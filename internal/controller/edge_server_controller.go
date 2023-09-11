@@ -24,8 +24,8 @@ const (
 )
 
 func (r *FLClusterReconciler) createOrUpdateEdgeServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
-	desiredDep, er2 := r.edgeServerDesiredDeployment(cluster)
-	desiredService, er1 := r.edgeServerDesiredService(cluster)
+	desiredDep, er2 := r.desiredEdgeServerDeployment(cluster)
+	desiredService, er1 := r.desiredEdgeServerService(cluster)
 	if er1 != nil {
 		return er1
 	}
@@ -78,7 +78,7 @@ func (r *FLClusterReconciler) deleteEdgeServer(ctx context.Context, cluster v1al
 	return nil
 }
 
-func (r *FLClusterReconciler) edgeServerDesiredDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
+func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
 	resources, _ := utils.ResourceRequirements(cluster.Spec.EdgeServer.Resources)
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -128,7 +128,7 @@ func (r *FLClusterReconciler) edgeServerDesiredDeployment(cluster *v1alpha1.FLCl
 	return dep, nil
 }
 
-func (r *FLClusterReconciler) edgeServerDesiredService(cluster *v1alpha1.FLCluster) (*corev1.Service, error) {
+func (r *FLClusterReconciler) desiredEdgeServerService(cluster *v1alpha1.FLCluster) (*corev1.Service, error) {
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: cluster.Namespace,
