@@ -18,6 +18,10 @@ package controller
 
 import (
 	"context"
+	"fmt"
+	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/api/errors"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -47,11 +51,53 @@ type FLClusterReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.15.0/pkg/reconcile
 func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	var flc kflv1alpha1.FLCluster
+	err := r.Get(ctx, req.NamespacedName, &flc)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			logger.Info("Object not found, it could have been deleted")
+			return ctrl.Result{}, nil
+		}
+		logger.Info("Error occurred during fetching the object")
+		return ctrl.Result{}, err
+	}
+
+	requestArray := strings.Split(fmt.Sprint(req), "/")
+	requestName := requestArray[1]
+
+	if requestName == flc.Name {
+		err = r.createOrUpdateComponents(ctx, &flc, logger)
+		if err != nil {
+			logger.Info("Error occurred during create Or Update Components")
+			return ctrl.Result{}, err
+		}
+	}
 
 	return ctrl.Result{}, nil
+}
+
+func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc *kflv1alpha1.FLCluster, logger logr.Logger) error {
+	err := r.createOrUpdateCentralServer(ctx, flc)
+	if err != nil {
+		logger.Info("Error occurred during createOrUpdateCentralServer")
+		return err
+	}
+
+	err1 := r.createOrUpdateEdgeServer(ctx, flc)
+	if err1 != nil {
+		logger.Info("Error occurred during createOrUpdateEdgeServer")
+		return err1
+	}
+
+	err2 := r.createOrUpdateEdgeClient(ctx, flc)
+	if err2 != nil {
+		logger.Info("Error occurred during createOrUpdateEdgeClient")
+		return err2
+	}
+
+	return nil
 }
 
 // SetupWithManager sets up the controller with the Manager.

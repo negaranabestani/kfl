@@ -13,54 +13,7 @@ import (
 	"testing"
 )
 
-func centralServerCreateOrUpdateTest(t *testing.T) {
-	scheme := runtime.NewScheme()
-	_ = corev1.AddToScheme(scheme)
-	_ = appsv1.AddToScheme(scheme)
-	_ = v1alpha1.AddToScheme(scheme)
-
-	flCluster := &v1alpha1.FLCluster{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-fl",
-			Namespace: "sample",
-		},
-		Spec: v1alpha1.FLClusterSpec{
-			CentralServer: v1alpha1.Device{
-				Replica: 1,
-				Resources: v1alpha1.Resources{
-					Cpu:    "1000m",
-					Memory: "5Gi",
-				},
-			},
-		},
-	}
-	r := &FLClusterReconciler{
-		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
-		Scheme: scheme,
-	}
-	err := r.createOrUpdateCentralServer(context.Background(), flCluster)
-	if err != nil {
-		t.Fatalf("failed to create or update edge server")
-	}
-	deployment := &appsv1.Deployment{}
-	err1 := r.Get(context.Background(), client.ObjectKey{
-		Name:      flCluster.Name + "-" + edgeServer,
-		Namespace: flCluster.Namespace,
-	}, deployment)
-	if err1 != nil {
-		t.Errorf("failed to get deployment")
-	}
-	service := &corev1.Service{}
-	err2 := r.Get(context.Background(), client.ObjectKey{
-		Name:      flCluster.Name + "-" + edgeServer,
-		Namespace: flCluster.Namespace,
-	}, service)
-	if err2 != nil {
-		t.Errorf("failed to get service")
-	}
-}
-
-func CentralServerDesiredDeploymentTest(t *testing.T) {
+func edgeServerCreateOrUpdateTest(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = corev1.AddToScheme(scheme)
 	_ = appsv1.AddToScheme(scheme)
@@ -72,7 +25,7 @@ func CentralServerDesiredDeploymentTest(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			CentralServer: v1alpha1.Device{
+			EdgeServer: v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
 					Cpu:    "1000m",
@@ -85,7 +38,54 @@ func CentralServerDesiredDeploymentTest(t *testing.T) {
 		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
 		Scheme: scheme,
 	}
-	expectedName := flCluster.Name + "-central-server"
+	err := r.createOrUpdateEdgeServer(context.Background(), flCluster)
+	if err != nil {
+		t.Fatalf("failed to create or update edge server")
+	}
+	deployment := &appsv1.Deployment{}
+	err1 := r.Get(context.Background(), client.ObjectKey{
+		Name:      flCluster.Name + "-edge-server",
+		Namespace: flCluster.Namespace,
+	}, deployment)
+	if err1 != nil {
+		t.Errorf("failed to get deployment")
+	}
+	service := &corev1.Service{}
+	err2 := r.Get(context.Background(), client.ObjectKey{
+		Name:      flCluster.Name + "-edge-server",
+		Namespace: flCluster.Namespace,
+	}, service)
+	if err2 != nil {
+		t.Errorf("failed to get service")
+	}
+}
+
+func EdgeServerDesiredDeploymentTest(t *testing.T) {
+	scheme := runtime.NewScheme()
+	_ = corev1.AddToScheme(scheme)
+	_ = appsv1.AddToScheme(scheme)
+	_ = v1alpha1.AddToScheme(scheme)
+
+	flCluster := &v1alpha1.FLCluster{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "test-fl",
+			Namespace: "default",
+		},
+		Spec: v1alpha1.FLClusterSpec{
+			EdgeServer: v1alpha1.Device{
+				Replica: 1,
+				Resources: v1alpha1.Resources{
+					Cpu:    "1000m",
+					Memory: "128Mi",
+				},
+			},
+		},
+	}
+	r := &FLClusterReconciler{
+		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
+		Scheme: scheme,
+	}
+	expectedName := flCluster.Name + "-edge-server"
 	expectedNamespace := flCluster.Namespace
 	expectedResource := v1alpha1.Resources{
 		Cpu:    "1000m",
@@ -93,11 +93,10 @@ func CentralServerDesiredDeploymentTest(t *testing.T) {
 	}
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
-		"app":     CentralServerSelectorApp,
+		"app":     edgeServerSelectorApp,
 	}
-	expectedContainerName := flCluster.Name + "-central-server"
-	expectedVolumeMountName := flCluster.Name + "-data"
-	deployment, err := r.centralServerDesiredDeployment(flCluster)
+	expectedContainerName := flCluster.Name + "-edge-server"
+	deployment, err := r.edgeServerDesiredDeployment(flCluster)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, deployment.Name)
 	assert.Equal(t, expectedNamespace, deployment.Namespace)
@@ -106,15 +105,13 @@ func CentralServerDesiredDeploymentTest(t *testing.T) {
 	assert.Equal(t, expectedLabels, deployment.Spec.Selector)
 	assert.Equal(t, expectedLabels, deployment.Spec.Template.Labels)
 	assert.Equal(t, expectedContainerName, deployment.Spec.Template.Spec.Containers[0].Name)
-	assert.Equal(t, expectedVolumeMountName, deployment.Spec.Template.Spec.Containers[0].VolumeMounts[0].Name)
-	assert.Equal(t, expectedVolumeMountName, deployment.Spec.Template.Spec.Volumes[0].Name)
 
 	if *deployment.Spec.Replicas != 1 {
-		t.Errorf("expected 1 central server deployment replica go %d", *deployment.Spec.Replicas)
+		t.Errorf("expected 1 edge server deployment replica go %d", *deployment.Spec.Replicas)
 	}
 }
 
-func CentralServerDesiredServiceTest(t *testing.T) {
+func EdgeServerDesiredServiceTest(t *testing.T) {
 	scheme := runtime.NewScheme()
 	_ = corev1.AddToScheme(scheme)
 	_ = appsv1.AddToScheme(scheme)
@@ -126,7 +123,7 @@ func CentralServerDesiredServiceTest(t *testing.T) {
 			Namespace: "default",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			CentralServer: v1alpha1.Device{
+			EdgeServer: v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
 					Cpu:    "1000m",
@@ -140,51 +137,18 @@ func CentralServerDesiredServiceTest(t *testing.T) {
 		Scheme: scheme,
 	}
 
-	expectedName := flCluster.Name + "-central-server"
+	expectedName := flCluster.Name + "-edge-server"
 	expectedNamespace := flCluster.Namespace
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
-		"app":     CentralServerSelectorApp,
+		"app":     edgeServerSelectorApp,
 	}
 
-	service, err := r.centralServerDesiredService(flCluster)
+	service, err := r.edgeServerDesiredService(flCluster)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, service.Name)
 	assert.Equal(t, expectedNamespace, service.Namespace)
 	assert.Equal(t, expectedLabels, service.Labels)
 	assert.Equal(t, expectedLabels, service.Spec.Selector)
-}
-
-func CentralServerDesiredPVCTest(t *testing.T) {
-	scheme := runtime.NewScheme()
-	_ = corev1.AddToScheme(scheme)
-	_ = appsv1.AddToScheme(scheme)
-	_ = v1alpha1.AddToScheme(scheme)
-
-	flCluster := &v1alpha1.FLCluster{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "test-fl",
-			Namespace: "default",
-		},
-		Spec: v1alpha1.FLClusterSpec{
-			CentralServer: v1alpha1.Device{
-				Replica: 1,
-				Resources: v1alpha1.Resources{
-					Cpu:    "1000m",
-					Memory: "128Mi",
-				},
-			},
-		},
-	}
-	r := &FLClusterReconciler{
-		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
-		Scheme: scheme,
-	}
-
-	expectedName := flCluster.Name + "-central-server"
-	pvc, err := r.centralServerDesiredPVC(flCluster)
-	assert.Nil(t, err)
-	assert.Equal(t, expectedName, pvc.Name)
-
 }
