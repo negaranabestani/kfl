@@ -56,7 +56,7 @@ type FLClusterStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 	GlobalTrainingTime int64               `json:"global-training-time"`
 	GlobalRounds       int                 `json:"global-rounds"`
-	GlobalAccuracy     float64             `json:"global-accuracy"`
+	GlobalAccuracy     string              `json:"global-accuracy"`
 	LocalTrainings     []LocalTrainingData `json:"local-trainings"`
 }
 
