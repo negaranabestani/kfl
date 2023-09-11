@@ -64,18 +64,6 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 								},
 							},
 							Resources: *resources,
-							VolumeMounts: []corev1.VolumeMount{
-								{
-									Name:      "",
-									MountPath: "",
-								},
-							},
-						},
-					},
-					Volumes: []corev1.Volume{
-						{
-							Name:         "",
-							VolumeSource: corev1.VolumeSource{},
 						},
 					},
 				},
