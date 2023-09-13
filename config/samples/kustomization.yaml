@@ -1,4 +1,0 @@
-## Append samples of your project ##
-resources:
-- kfl_v1alpha1_flcluster.yaml
-#+kubebuilder:scaffold:manifestskustomizesamples

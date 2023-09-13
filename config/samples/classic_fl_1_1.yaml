@@ -1,0 +1,16 @@
+apiVersion: kfl.aut.tech/v1alpha1
+kind: FLCluster
+metadata:
+  name: fl-cluster-classic-1-1
+  namespace: sample
+spec:
+  central-server:
+    replicas: 1
+    resources:
+      cpu: 1
+      memory: 5Gi
+  edge-client:
+    replicas: 1
+    resources:
+      cpu: 1
+      memory: 5Gi
