@@ -4,12 +4,12 @@ metadata:
   name: fl-cluster-classic-1-1
   namespace: sample
 spec:
-  central-server:
+  centralServer:
     replicas: 1
     resources:
       cpu: 1
       memory: 5Gi
-  edge-client:
+  edgeClient:
     replicas: 1
     resources:
       cpu: 1
