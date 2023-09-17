@@ -3,7 +3,7 @@ package controller
 import (
 	"context"
 	"github.com/negaranabestani/kfl/api/v1alpha1"
-	utils "github.com/negaranabestani/kfl/internal/util"
+	utils "github.com/negaranabestani/kfl/util"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
