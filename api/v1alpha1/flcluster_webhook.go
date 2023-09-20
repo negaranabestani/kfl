@@ -70,8 +70,8 @@ func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
 	if e2 != nil {
 		return nil, errors.New("edge client: " + e2.Error())
 	}
-	if &f.Spec.EdgeServer != nil {
-		e3 := validateDevice(&f.Spec.EdgeServer)
+	if f.Spec.EdgeServer != nil {
+		e3 := validateDevice(f.Spec.EdgeServer)
 		if e3 != nil {
 			return nil, errors.New("edge server: " + e3.Error())
 		}
@@ -103,8 +103,8 @@ func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 	if !validateResourceUpdate(&f.Spec.EdgeClient.Resources, &oldCluster.Spec.EdgeClient.Resources) {
 		return nil, errors.New("invalid new edge client resource")
 	}
-	if &f.Spec.EdgeServer != nil {
-		e3 := validateDevice(&f.Spec.EdgeServer)
+	if f.Spec.EdgeServer != nil {
+		e3 := validateDevice(f.Spec.EdgeServer)
 		if e3 != nil {
 			return nil, errors.New("edge server: " + e3.Error())
 		}
