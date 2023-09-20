@@ -5,12 +5,12 @@ metadata:
   namespace: sample
 spec:
   centralServer:
-    replicas: 1
+    replica: 1
     resources:
       cpu: 1
       memory: 5Gi
   edgeClient:
-    replicas: 1
+    replica: 1
     resources:
       cpu: 1
       memory: 5Gi
