@@ -7,10 +7,10 @@ spec:
   centralServer:
     replica: 1
     resources:
-      cpu: 1
-      memory: 5Gi
+      cpu: "1"
+      memory: "5Gi"
   edgeClient:
     replica: 1
     resources:
-      cpu: 1
-      memory: 5Gi
+      cpu: "1"
+      memory: "5Gi"
