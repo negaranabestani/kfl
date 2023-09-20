@@ -32,7 +32,7 @@ func flClusterCreateOrUpdateComponentsTest(t *testing.T) {
 					Memory: "128Mi",
 				},
 			},
-			EdgeServer: v1alpha1.Device{
+			EdgeServer: &v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
 					Cpu:    "1000m",
