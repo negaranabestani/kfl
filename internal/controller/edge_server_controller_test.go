@@ -25,7 +25,7 @@ func edgeServerCreateOrUpdateTest(t *testing.T) {
 			Namespace: "sample",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			EdgeServer: v1alpha1.Device{
+			EdgeServer: &v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
 					Cpu:    "1000m",
@@ -72,7 +72,7 @@ func DesiredEdgeServerDeploymentTest(t *testing.T) {
 			Namespace: "sample",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			EdgeServer: v1alpha1.Device{
+			EdgeServer: &v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
 					Cpu:    "1000m",
@@ -123,7 +123,7 @@ func DesiredEdgeServerServiceTest(t *testing.T) {
 			Namespace: "sample",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			EdgeServer: v1alpha1.Device{
+			EdgeServer: &v1alpha1.Device{
 				Replica: 1,
 				Resources: v1alpha1.Resources{
 					Cpu:    "1000m",
