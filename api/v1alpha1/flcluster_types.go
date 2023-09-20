@@ -29,10 +29,11 @@ type FLClusterSpec struct {
 	// Important: Run "make" to regenerate code after modifying this file
 
 	CentralServer Device `json:"centralServer"`
-	EdgeServer    Device `json:"edgeServer"`
-	EdgeClient    Device `json:"edgeClient"`
-	Dataset       string `json:"dataset"`
-	ModelName     string `json:"modelName"`
+	// +kubebuilder:validation:Optional
+	EdgeServer *Device `json:"edgeServer,omitempty"`
+	EdgeClient Device  `json:"edgeClient"`
+	Dataset    string  `json:"dataset"`
+	ModelName  string  `json:"modelName"`
 }
 
 type Device struct {
@@ -68,7 +69,7 @@ type FLCluster struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   FLClusterSpec   `json:"spec,omitempty"`
+	Spec   FLClusterSpec   `json:"spec"`
 	Status FLClusterStatus `json:"status,omitempty"`
 }
 

@@ -17,7 +17,9 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"regexp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -27,9 +29,9 @@ import (
 // log is for logging in this package.
 var flclusterlog = logf.Log.WithName("flcluster-resource")
 
-func (r *FLCluster) SetupWebhookWithManager(mgr ctrl.Manager) error {
+func (f *FLCluster) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
-		For(r).
+		For(f).
 		Complete()
 }
 
@@ -40,10 +42,9 @@ func (r *FLCluster) SetupWebhookWithManager(mgr ctrl.Manager) error {
 var _ webhook.Defaulter = &FLCluster{}
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type
-func (r *FLCluster) Default() {
-	flclusterlog.Info("default", "name", r.Name)
+func (f *FLCluster) Default() {
+	flclusterlog.Info("default", "name", f.Name)
 
-	// TODO(user): fill in your defaulting logic.
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
@@ -52,25 +53,103 @@ func (r *FLCluster) Default() {
 var _ webhook.Validator = &FLCluster{}
 
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
-func (r *FLCluster) ValidateCreate() (admission.Warnings, error) {
-	flclusterlog.Info("validate create", "name", r.Name)
+func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
+	flclusterlog.Info("validate create", "name", f.Name)
 
-	// TODO(user): fill in your validation logic upon object creation.
+	if &f.Spec.CentralServer == nil {
+		return nil, errors.New("empty central server")
+	}
+	if &f.Spec.EdgeClient == nil {
+		return nil, errors.New("empty edge client")
+	}
+	e1 := validateDevice(&f.Spec.CentralServer)
+	if e1 != nil {
+		return nil, errors.New("central server: " + e1.Error())
+	}
+	e2 := validateDevice(&f.Spec.EdgeClient)
+	if e2 != nil {
+		return nil, errors.New("edge client: " + e2.Error())
+	}
+	if f.Spec.EdgeServer != nil {
+		e3 := validateDevice(f.Spec.EdgeServer)
+		if e3 != nil {
+			return nil, errors.New("edge server: " + e3.Error())
+		}
+	}
 	return nil, nil
 }
 
 // ValidateUpdate implements webhook.Validator so a webhook will be registered for the type
-func (r *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
-	flclusterlog.Info("validate update", "name", r.Name)
-
-	// TODO(user): fill in your validation logic upon object update.
+func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, error) {
+	flclusterlog.Info("validate update", "name", f.Name)
+	oldCluster := old.(*FLCluster)
+	if &f.Spec.CentralServer == nil {
+		return nil, errors.New("empty central server")
+	}
+	if &f.Spec.EdgeClient == nil {
+		return nil, errors.New("empty edge client")
+	}
+	e1 := validateDevice(&f.Spec.CentralServer)
+	if e1 != nil {
+		return nil, errors.New("central server: " + e1.Error())
+	}
+	if !validateResourceUpdate(&f.Spec.CentralServer.Resources, &oldCluster.Spec.CentralServer.Resources) {
+		return nil, errors.New("invalid new central server resource")
+	}
+	e2 := validateDevice(&f.Spec.EdgeClient)
+	if e2 != nil {
+		return nil, errors.New("edge client: " + e2.Error())
+	}
+	if !validateResourceUpdate(&f.Spec.EdgeClient.Resources, &oldCluster.Spec.EdgeClient.Resources) {
+		return nil, errors.New("invalid new edge client resource")
+	}
+	if f.Spec.EdgeServer != nil {
+		e3 := validateDevice(f.Spec.EdgeServer)
+		if e3 != nil {
+			return nil, errors.New("edge server: " + e3.Error())
+		}
+		if !validateResourceUpdate(&f.Spec.EdgeServer.Resources, &oldCluster.Spec.EdgeServer.Resources) {
+			return nil, errors.New("invalid new edge server resource")
+		}
+	}
 	return nil, nil
 }
 
 // ValidateDelete implements webhook.Validator so a webhook will be registered for the type
-func (r *FLCluster) ValidateDelete() (admission.Warnings, error) {
-	flclusterlog.Info("validate delete", "name", r.Name)
+func (f *FLCluster) ValidateDelete() (admission.Warnings, error) {
+	flclusterlog.Info("validate delete", "name", f.Name)
 
 	// TODO(user): fill in your validation logic upon object deletion.
 	return nil, nil
+}
+func validateDevice(d *Device) error {
+
+	if &d.Replica == nil || d.Replica != 1 {
+		return errors.New("invalid replica")
+	}
+
+	if !validateResource(&d.Resources) {
+		return errors.New("invalid resource")
+	}
+	return nil
+}
+func validateResource(r *Resources) bool {
+	pattern := `^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$`
+
+	compile := regexp.MustCompile(pattern)
+
+	if r.Cpu != "" && !compile.MatchString(r.Cpu) {
+		return false
+	}
+	if r.Memory != "" && !compile.MatchString(r.Memory) {
+		return false
+	}
+	//if !compile.MatchString(r.Storage) {
+	//	return false
+	//}
+	return true
+}
+
+func validateResourceUpdate(r *Resources, o *Resources) bool {
+	return true
 }
