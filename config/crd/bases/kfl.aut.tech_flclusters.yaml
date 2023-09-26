@@ -99,7 +99,6 @@ spec:
             - centralServer
             - dataset
             - edgeClient
-            - edgeServer
             - modelName
             type: object
           status:
@@ -174,6 +173,8 @@ spec:
             - globalTrainingTime
             - localTrainings
             type: object
+        required:
+        - spec
         type: object
     served: true
     storage: true
