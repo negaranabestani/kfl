@@ -13,6 +13,7 @@ import (
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/log"
 )
 
 const (
@@ -28,6 +29,7 @@ const (
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
 	desiredDep, er2 := r.desiredCentralServerDeployment(cluster)
 	desiredService, er1 := r.desiredCentralServerService(cluster)
+	logger := log.FromContext(ctx)
 	if er1 != nil {
 		return er1
 	}
@@ -37,16 +39,19 @@ func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, c
 	existingDep := &appsv1.Deployment{}
 	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredDep), existingDep)
 	if err3 != nil && !errors.IsNotFound(err3) {
+		logger.Info(err3.Error())
 		return err3
 	}
 	if errors.IsNotFound(err3) {
 		if err := r.Create(ctx, desiredDep); err != nil {
+			logger.Info(err.Error())
 			return err
 		}
 	}
 	if !reflect.DeepEqual(existingDep, desiredDep) {
 		existingDep = desiredDep
 		if err4 := r.Update(ctx, existingDep); err4 != nil {
+			logger.Info(err4.Error())
 			return err4
 		}
 	}
@@ -54,22 +59,26 @@ func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, c
 	existingSer := &corev1.Service{}
 	err5 := r.Get(ctx, client.ObjectKeyFromObject(desiredService), existingSer)
 	if err5 != nil && !errors.IsNotFound(err5) {
+		logger.Info(err5.Error())
 		return err5
 	}
 	if errors.IsNotFound(err5) {
 		if err := r.Create(ctx, desiredService); err != nil {
+			logger.Info(err.Error())
 			return err
 		}
 	}
 	if !reflect.DeepEqual(existingSer, desiredService) {
 		existingSer = desiredService
 		if err4 := r.Update(ctx, existingSer); err4 != nil {
+			logger.Info(err4.Error())
 			return err4
 		}
 	}
 
 	err6 := r.Status().Update(ctx, cluster)
 	if err6 != nil {
+		logger.Info(err6.Error())
 		return err6
 	}
 	return nil

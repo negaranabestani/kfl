@@ -58,7 +58,7 @@ type FLClusterStatus struct {
 	GlobalTrainingTime int64               `json:"globalTrainingTime"`
 	GlobalRounds       int                 `json:"globalRounds"`
 	GlobalAccuracy     string              `json:"globalAccuracy"`
-	LocalTrainings     []LocalTrainingData `json:"localTrainings"`
+	LocalTrainings     []LocalTrainingData `json:"localTrainings,omitempty"`
 }
 
 //+kubebuilder:object:root=true
