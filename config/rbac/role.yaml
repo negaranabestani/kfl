@@ -17,6 +17,50 @@ rules:
   - update
   - watch
 - apiGroups:
+    - ""
+  resources:
+    - persistentvolumeclaims
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - ""
+  resources:
+    - services
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - apps
+  resources:
+    - deployments
+  verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - update
+    - watch
+- apiGroups:
+    - hdfs.aut.tech
+  resources:
+    - hdfsclusters/status
+  verbs:
+    - get
+    - patch
+    - update
+- apiGroups:
   - kfl.aut.tech
   resources:
   - flclusters/finalizers
