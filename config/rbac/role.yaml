@@ -41,7 +41,7 @@ rules:
     - update
     - watch
 - apiGroups:
-    - ""
+    - apps
   resources:
     - deployments
   verbs:
@@ -53,9 +53,9 @@ rules:
     - update
     - watch
 - apiGroups:
-    - hdfs.aut.tech
+    - kfl.aut.tech
   resources:
-    - hdfsclusters/status
+    - flclusters/status
   verbs:
     - get
     - patch
