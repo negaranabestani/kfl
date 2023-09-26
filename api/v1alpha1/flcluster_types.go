@@ -55,10 +55,10 @@ type LocalTrainingData struct {
 type FLClusterStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	GlobalTrainingTime int64               `json:"globalTrainingTime"`
-	GlobalRounds       int                 `json:"globalRounds"`
-	GlobalAccuracy     string              `json:"globalAccuracy"`
-	LocalTrainings     []LocalTrainingData `json:"localTrainings,omitempty"`
+	GlobalTrainingTime int64  `json:"globalTrainingTime"`
+	GlobalRounds       int    `json:"globalRounds"`
+	GlobalAccuracy     string `json:"globalAccuracy"`
+	//LocalTrainings     []LocalTrainingData `json:"localTrainings,omitempty"`
 }
 
 //+kubebuilder:object:root=true
