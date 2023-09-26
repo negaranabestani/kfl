@@ -171,7 +171,6 @@ spec:
             - globalAccuracy
             - globalRounds
             - globalTrainingTime
-            - localTrainings
             type: object
         required:
         - spec
