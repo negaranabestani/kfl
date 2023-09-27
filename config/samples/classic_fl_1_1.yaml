@@ -8,10 +8,10 @@ spec:
     replica: 1
     resources:
       cpu: "1"
-      memory: "5Gi"
+      memory: "2Gi"
   edgeClient:
     replica: 1
     resources:
       cpu: "1"
-      memory: "5Gi"
+      memory: "2Gi"
   
