@@ -89,10 +89,12 @@ func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc 
 		return err
 	}
 
-	err1 := r.createOrUpdateEdgeServer(ctx, flc)
-	if err1 != nil {
-		logger.Info("Error occurred during createOrUpdateEdgeServer")
-		return err1
+	if flc.Spec.EdgeServer != nil {
+		err1 := r.createOrUpdateEdgeServer(ctx, flc)
+		if err1 != nil {
+			logger.Info("Error occurred during createOrUpdateEdgeServer")
+			return err1
+		}
 	}
 
 	err2 := r.createOrUpdateEdgeClient(ctx, flc)
