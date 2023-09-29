@@ -218,8 +218,8 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 	if err != nil {
 		return nil, err
 	}
-	var sName *string
-	*sName = "fast"
+
+	sName := "fast"
 	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cluster.Name + "-" + CentralServer,
@@ -230,7 +230,7 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 			},
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
-			StorageClassName: sName,
+			StorageClassName: &sName,
 			AccessModes: []corev1.PersistentVolumeAccessMode{
 				"ReadWriteOnce",
 			},
