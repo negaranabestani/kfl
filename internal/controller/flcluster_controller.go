@@ -47,6 +47,7 @@ type FLClusterReconciler struct {
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=persistentvolumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=storageclasses,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -87,7 +88,7 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc *kflv1alpha1.FLCluster, logger logr.Logger) error {
-	err0 := r.createOrUpdateSC(ctx, flc)
+	err0 := r.createOrUpdateSC(ctx)
 	if err0 != nil {
 		logger.Info("Error occurred during createOrUpdateStorageClass")
 		return err0
@@ -114,8 +115,8 @@ func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc 
 
 	return nil
 }
-func (r *FLClusterReconciler) createOrUpdateSC(ctx context.Context, cluster *kflv1alpha1.FLCluster) error {
-	desiredSC, err := r.desiredSC(cluster)
+func (r *FLClusterReconciler) createOrUpdateSC(ctx context.Context) error {
+	desiredSC, err := r.desiredSC()
 	logger := log.FromContext(ctx)
 	if err != nil {
 		return err
@@ -141,7 +142,7 @@ func (r *FLClusterReconciler) createOrUpdateSC(ctx context.Context, cluster *kfl
 	}
 	return nil
 }
-func (r *FLClusterReconciler) desiredSC(cluster *kflv1alpha1.FLCluster) (*v1.StorageClass, error) {
+func (r *FLClusterReconciler) desiredSC() (*v1.StorageClass, error) {
 	sc := &v1.StorageClass{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "fast",
@@ -150,9 +151,6 @@ func (r *FLClusterReconciler) desiredSC(cluster *kflv1alpha1.FLCluster) (*v1.Sto
 		Parameters: map[string]string{
 			"type": "pd-ssd",
 		},
-	}
-	if err := ctrl.SetControllerReference(cluster, sc, r.Scheme); err != nil {
-		return sc, err
 	}
 	return sc, nil
 }
