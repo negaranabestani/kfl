@@ -27,10 +27,14 @@ const (
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
+	desiredPV, er8 := r.desiredCentralServerPV(cluster)
 	desiredPVC, er0 := r.desiredCentralServerPVC(cluster)
 	desiredDep, er2 := r.desiredCentralServerDeployment(cluster)
 	desiredService, er1 := r.desiredCentralServerService(cluster)
 	logger := log.FromContext(ctx)
+	if er8 != nil {
+		return er8
+	}
 	if er0 != nil {
 		return er0
 	}
@@ -41,6 +45,26 @@ func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, c
 		logger.Info(er2.Error())
 		return er2
 	}
+	existingPV := &corev1.PersistentVolume{}
+	err9 := r.Get(ctx, client.ObjectKeyFromObject(desiredPV), existingPV)
+	if err9 != nil && !errors.IsNotFound(err9) {
+		logger.Info(err9.Error())
+		return err9
+	}
+	if errors.IsNotFound(err9) {
+		if err := r.Create(ctx, desiredPV); err != nil {
+			logger.Info(err.Error())
+			return err
+		}
+	}
+	if !reflect.DeepEqual(existingPV, desiredPV) {
+		existingPV = desiredPV
+		if err4 := r.Update(ctx, existingPV); err4 != nil {
+			logger.Info(err4.Error())
+			return err4
+		}
+	}
+
 	existingPVC := &corev1.PersistentVolumeClaim{}
 	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredPVC), existingPVC)
 	if err3 != nil && !errors.IsNotFound(err3) {
@@ -53,7 +77,7 @@ func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, c
 			return err
 		}
 	}
-	if !reflect.DeepEqual(existingPVC, desiredDep) {
+	if !reflect.DeepEqual(existingPVC, desiredPVC) {
 		existingPVC = desiredPVC
 		if err4 := r.Update(ctx, existingPVC); err4 != nil {
 			logger.Info(err4.Error())
@@ -249,4 +273,33 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 		return pvc, err
 	}
 	return pvc, nil
+}
+
+func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolume, error) {
+	storage, err := resource.ParseQuantity("1Gi")
+	if err != nil {
+		return nil, err
+	}
+	pv := &corev1.PersistentVolume{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      cluster.Name + "-" + CentralServer,
+			Namespace: cluster.Namespace,
+			Labels: map[string]string{
+				"cluster": cluster.Name,
+				"app":     CentralServerSelectorApp,
+			},
+		},
+		Spec: corev1.PersistentVolumeSpec{
+			Capacity: corev1.ResourceList{
+				corev1.ResourceStorage: storage,
+			},
+			AccessModes: []corev1.PersistentVolumeAccessMode{
+				"ReadWriteOnce",
+			},
+		},
+	}
+	if err := ctrl.SetControllerReference(cluster, pv, r.Scheme); err != nil {
+		return pv, err
+	}
+	return pv, nil
 }
