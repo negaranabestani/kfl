@@ -20,7 +20,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
+	v1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -84,6 +87,11 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc *kflv1alpha1.FLCluster, logger logr.Logger) error {
+	err0 := r.createOrUpdateSC(ctx, flc)
+	if err0 != nil {
+		logger.Info("Error occurred during createOrUpdateStorageClass")
+		return err0
+	}
 	err := r.createOrUpdateCentralServer(ctx, flc)
 	if err != nil {
 		logger.Info("Error occurred during createOrUpdateCentralServer")
@@ -105,6 +113,48 @@ func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc 
 	}
 
 	return nil
+}
+func (r *FLClusterReconciler) createOrUpdateSC(ctx context.Context, cluster *kflv1alpha1.FLCluster) error {
+	desiredSC, err := r.desiredSC(cluster)
+	logger := log.FromContext(ctx)
+	if err != nil {
+		return err
+	}
+	existingSC := &v1.StorageClass{}
+	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredSC), existingSC)
+	if err3 != nil && !errors.IsNotFound(err3) {
+		logger.Info(err3.Error())
+		return err3
+	}
+	if errors.IsNotFound(err3) {
+		if err := r.Create(ctx, desiredSC); err != nil {
+			logger.Info(err.Error())
+			return err
+		}
+	}
+	if !reflect.DeepEqual(existingSC, desiredSC) {
+		existingSC = desiredSC
+		if err4 := r.Update(ctx, existingSC); err4 != nil {
+			logger.Info(err4.Error())
+			return err4
+		}
+	}
+	return nil
+}
+func (r *FLClusterReconciler) desiredSC(cluster *kflv1alpha1.FLCluster) (*v1.StorageClass, error) {
+	sc := &v1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "fast",
+		},
+		Provisioner: "kubernetes.io/gce-pd",
+		Parameters: map[string]string{
+			"type": "pd-ssd",
+		},
+	}
+	if err := ctrl.SetControllerReference(cluster, sc, r.Scheme); err != nil {
+		return sc, err
+	}
+	return sc, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
