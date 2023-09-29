@@ -284,6 +284,7 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 		return nil, err
 	}
 	sName := "fast"
+	fsType := "ext4"
 	vMode := corev1.PersistentVolumeMode("Filesystem")
 	pv := &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
@@ -302,6 +303,29 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 			},
 			AccessModes: []corev1.PersistentVolumeAccessMode{
 				"ReadWriteOnce",
+			},
+			NodeAffinity: &corev1.VolumeNodeAffinity{
+				Required: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{
+							MatchExpressions: []corev1.NodeSelectorRequirement{
+								{
+									Key:      "fl-role",
+									Operator: corev1.NodeSelectorOperator("In"),
+									Values: []string{
+										"central-server",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			PersistentVolumeSource: corev1.PersistentVolumeSource{
+				Local: &corev1.LocalVolumeSource{
+					Path:   "/data",
+					FSType: &fsType,
+				},
 			},
 		},
 	}
