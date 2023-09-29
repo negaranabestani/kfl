@@ -17,7 +17,7 @@ import (
 const (
 	EdgeClient                  = "edge-client"
 	EdgeClientSelectorApp       = "edge-client"
-	EdgeClientImage             = "kennethreitz/httpbin"
+	EdgeClientImage             = "curlimages/curl"
 	EdgeClientContainerPort     = 9001
 	EdgeClientContainerPortName = "httpbin"
 	EdgeClientServicePort       = 9001

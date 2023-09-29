@@ -27,9 +27,13 @@ const (
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
+	desiredPVC, er0 := r.desiredCentralServerPVC(cluster)
 	desiredDep, er2 := r.desiredCentralServerDeployment(cluster)
 	desiredService, er1 := r.desiredCentralServerService(cluster)
 	logger := log.FromContext(ctx)
+	if er0 != nil {
+		return er0
+	}
 	if er1 != nil {
 		return er1
 	}
@@ -37,13 +41,33 @@ func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, c
 		logger.Info(er2.Error())
 		return er2
 	}
-	existingDep := &appsv1.Deployment{}
-	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredDep), existingDep)
+	existingPVC := &corev1.PersistentVolumeClaim{}
+	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredPVC), existingPVC)
 	if err3 != nil && !errors.IsNotFound(err3) {
 		logger.Info(err3.Error())
 		return err3
 	}
 	if errors.IsNotFound(err3) {
+		if err := r.Create(ctx, desiredPVC); err != nil {
+			logger.Info(err.Error())
+			return err
+		}
+	}
+	if !reflect.DeepEqual(existingPVC, desiredDep) {
+		existingPVC = desiredPVC
+		if err4 := r.Update(ctx, existingPVC); err4 != nil {
+			logger.Info(err4.Error())
+			return err4
+		}
+	}
+
+	existingDep := &appsv1.Deployment{}
+	err7 := r.Get(ctx, client.ObjectKeyFromObject(desiredDep), existingDep)
+	if err7 != nil && !errors.IsNotFound(err7) {
+		logger.Info(err7.Error())
+		return err7
+	}
+	if errors.IsNotFound(err7) {
 		if err := r.Create(ctx, desiredDep); err != nil {
 			logger.Info(err.Error())
 			return err
@@ -92,10 +116,6 @@ func (r *FLClusterReconciler) deleteCentralServer(ctx context.Context, cluster v
 
 func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
 	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
-	pvc, err := r.desiredCentralServerPVC(cluster)
-	if err != nil {
-		return nil, err
-	}
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cluster.Name + "-" + CentralServer,
@@ -145,7 +165,7 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 							Name: cluster.Name + "-data",
 							VolumeSource: corev1.VolumeSource{
 								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: pvc.Name,
+									ClaimName: cluster.Name + "-" + CentralServer,
 								},
 							},
 						},
@@ -214,6 +234,12 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 				Limits: nil,
 				Requests: corev1.ResourceList{
 					corev1.ResourceStorage: storage,
+				},
+			},
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{
+					"cluster": cluster.Name,
+					"app":     CentralServerSelectorApp,
 				},
 			},
 		},
