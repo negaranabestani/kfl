@@ -219,5 +219,8 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 		},
 	}
 
+	if err := ctrl.SetControllerReference(cluster, pvc, r.Scheme); err != nil {
+		return pvc, err
+	}
 	return pvc, nil
 }
