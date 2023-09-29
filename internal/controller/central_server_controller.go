@@ -237,7 +237,7 @@ func (r *FLClusterReconciler) desiredCentralServerService(cluster *v1alpha1.FLCl
 }
 
 func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolumeClaim, error) {
-	storage, err := resource.ParseQuantity("1M")
+	storage, err := resource.ParseQuantity("100M")
 	if err != nil {
 		return nil, err
 	}
@@ -255,7 +255,7 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 		Spec: corev1.PersistentVolumeClaimSpec{
 			StorageClassName: &sName,
 			AccessModes: []corev1.PersistentVolumeAccessMode{
-				"ReadWriteOnce",
+				"ReadWriteMany",
 			},
 			Resources: corev1.ResourceRequirements{
 				Limits: nil,
@@ -279,7 +279,7 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 }
 
 func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster) (*corev1.PersistentVolume, error) {
-	storage, err := resource.ParseQuantity("1Gi")
+	storage, err := resource.ParseQuantity("100M")
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +302,7 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 				corev1.ResourceStorage: storage,
 			},
 			AccessModes: []corev1.PersistentVolumeAccessMode{
-				"ReadWriteOnce",
+				"ReadWriteMany",
 			},
 			NodeAffinity: &corev1.VolumeNodeAffinity{
 				Required: &corev1.NodeSelector{
@@ -321,6 +321,7 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 					},
 				},
 			},
+			PersistentVolumeReclaimPolicy: corev1.PersistentVolumeReclaimPolicy("Delete"),
 			PersistentVolumeSource: corev1.PersistentVolumeSource{
 				Local: &corev1.LocalVolumeSource{
 					Path:   "/data",
