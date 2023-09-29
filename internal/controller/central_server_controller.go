@@ -34,6 +34,7 @@ func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, c
 		return er1
 	}
 	if er2 != nil {
+		logger.Info(er2.Error())
 		return er2
 	}
 	existingDep := &appsv1.Deployment{}
@@ -198,7 +199,12 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 	}
 	pvc := &corev1.PersistentVolumeClaim{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: cluster.Name + "-" + CentralServer,
+			Name:      cluster.Name + "-" + CentralServer,
+			Namespace: cluster.Namespace,
+			Labels: map[string]string{
+				"cluster": cluster.Name,
+				"app":     CentralServerSelectorApp,
+			},
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
 			AccessModes: []corev1.PersistentVolumeAccessMode{
