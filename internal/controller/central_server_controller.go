@@ -284,6 +284,7 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 		return nil, err
 	}
 	sName := "fast"
+	vMode := corev1.PersistentVolumeMode("Local")
 	pv := &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cluster.Name + "-" + CentralServer,
@@ -294,6 +295,7 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 			},
 		},
 		Spec: corev1.PersistentVolumeSpec{
+			VolumeMode:       &vMode,
 			StorageClassName: sName,
 			Capacity: corev1.ResourceList{
 				corev1.ResourceStorage: storage,
