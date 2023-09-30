@@ -253,6 +253,7 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 			},
 		},
 		Spec: corev1.PersistentVolumeClaimSpec{
+			VolumeName:       cluster.Name + "-" + CentralServer,
 			StorageClassName: &sName,
 			AccessModes: []corev1.PersistentVolumeAccessMode{
 				"ReadWriteMany",
