@@ -263,12 +263,6 @@ func (r *FLClusterReconciler) desiredCentralServerPVC(cluster *v1alpha1.FLCluste
 					corev1.ResourceStorage: storage,
 				},
 			},
-			Selector: &metav1.LabelSelector{
-				MatchLabels: map[string]string{
-					"cluster": cluster.Name,
-					"app":     CentralServerSelectorApp,
-				},
-			},
 		},
 	}
 
@@ -324,7 +318,7 @@ func (r *FLClusterReconciler) desiredCentralServerPV(cluster *v1alpha1.FLCluster
 			PersistentVolumeReclaimPolicy: corev1.PersistentVolumeReclaimPolicy("Delete"),
 			PersistentVolumeSource: corev1.PersistentVolumeSource{
 				Local: &corev1.LocalVolumeSource{
-					Path:   "/data",
+					Path:   centralServerMountPath,
 					FSType: &fsType,
 				},
 			},
