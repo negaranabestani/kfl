@@ -44,7 +44,33 @@ var _ webhook.Defaulter = &FLCluster{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (f *FLCluster) Default() {
 	flclusterlog.Info("default", "name", f.Name)
-
+	if f.Spec.EdgeServer != nil {
+		f.Spec.EdgeBased = "True"
+	} else if &f.Spec.EdgeBased == nil {
+		f.Spec.EdgeBased = "False"
+	}
+	if f.Spec.Splitting != "none_splitting" {
+		f.Spec.Offload = "True"
+	} else if &f.Spec.Splitting == nil {
+		f.Spec.Splitting = "none_splitting"
+	} else if &f.Spec.Offload == nil {
+		f.Spec.Offload = "False"
+	}
+	if &f.Spec.Aggegation == nil {
+		f.Spec.Aggegation = "fed_avg"
+	}
+	if &f.Spec.Clustering == nil {
+		f.Spec.Clustering = "none_clustering"
+	}
+	if &f.Spec.ModelName == nil {
+		f.Spec.ModelName = "vgg"
+	}
+	if &f.Spec.Dataset == nil {
+		f.Spec.Dataset = "cifar10"
+	}
+	if &f.Spec.Index == nil {
+		f.Spec.Index = "0"
+	}
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
