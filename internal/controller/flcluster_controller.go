@@ -20,7 +20,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-logr/logr"
+	v1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -43,6 +46,8 @@ type FLClusterReconciler struct {
 //+kubebuilder:rbac:groups=hdfs.aut.tech,resources=hdfsclusters/finalizers,verbs=update
 //+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="",resources=persistentvolumes,verbs=get;list;watch;create;update;patch;delete
+//+kubebuilder:rbac:groups="storage.k8s.io",resources=storageclasses,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups="",resources=services,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -83,6 +88,11 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 }
 
 func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc *kflv1alpha1.FLCluster, logger logr.Logger) error {
+	err0 := r.createOrUpdateSC(ctx)
+	if err0 != nil {
+		logger.Info("Error occurred during createOrUpdateStorageClass")
+		return err0
+	}
 	err := r.createOrUpdateCentralServer(ctx, flc)
 	if err != nil {
 		logger.Info("Error occurred during createOrUpdateCentralServer")
@@ -104,6 +114,45 @@ func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc 
 	}
 
 	return nil
+}
+func (r *FLClusterReconciler) createOrUpdateSC(ctx context.Context) error {
+	desiredSC, err := r.desiredSC()
+	logger := log.FromContext(ctx)
+	if err != nil {
+		return err
+	}
+	existingSC := &v1.StorageClass{}
+	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredSC), existingSC)
+	if err3 != nil && !errors.IsNotFound(err3) {
+		logger.Info(err3.Error())
+		return err3
+	}
+	if errors.IsNotFound(err3) {
+		if err := r.Create(ctx, desiredSC); err != nil {
+			logger.Info(err.Error())
+			return err
+		}
+	}
+	if !reflect.DeepEqual(existingSC, desiredSC) {
+		existingSC = desiredSC
+		if err4 := r.Update(ctx, existingSC); err4 != nil {
+			logger.Info(err4.Error())
+			return err4
+		}
+	}
+	return nil
+}
+func (r *FLClusterReconciler) desiredSC() (*v1.StorageClass, error) {
+	sc := &v1.StorageClass{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "fast",
+		},
+		Provisioner: "kubernetes.io/gce-pd",
+		Parameters: map[string]string{
+			"type": "pd-ssd",
+		},
+	}
+	return sc, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
