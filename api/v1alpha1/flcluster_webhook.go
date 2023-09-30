@@ -43,31 +43,31 @@ var _ webhook.Defaulter = &FLCluster{}
 func (f *FLCluster) Default() {
 	flclusterlog.Info("default", "name", f.Name)
 	if f.Spec.EdgeServer != nil {
-		f.Spec.EdgeBased = "True"
-	} else if &f.Spec.EdgeBased == nil {
-		f.Spec.EdgeBased = "False"
+		*f.Spec.EdgeBased = "True"
+	} else if f.Spec.EdgeBased == nil {
+		*f.Spec.EdgeBased = "False"
 	}
-	if f.Spec.Splitting != "none_splitting" {
-		f.Spec.Offload = "True"
-	} else if &f.Spec.Splitting == nil {
-		f.Spec.Splitting = "none_splitting"
-	} else if &f.Spec.Offload == nil {
-		f.Spec.Offload = "False"
+	if *f.Spec.Splitting != "none_splitting" {
+		*f.Spec.Offload = "True"
+	} else if f.Spec.Splitting == nil {
+		*f.Spec.Splitting = "none_splitting"
+	} else if f.Spec.Offload == nil {
+		*f.Spec.Offload = "False"
 	}
-	if &f.Spec.Aggegation == nil {
-		f.Spec.Aggegation = "fed_avg"
+	if f.Spec.Aggegation == nil {
+		*f.Spec.Aggegation = "fed_avg"
 	}
-	if &f.Spec.Clustering == nil {
-		f.Spec.Clustering = "none_clustering"
+	if f.Spec.Clustering == nil {
+		*f.Spec.Clustering = "none_clustering"
 	}
-	if &f.Spec.ModelName == nil {
-		f.Spec.ModelName = "vgg"
+	if f.Spec.ModelName == nil {
+		*f.Spec.ModelName = "vgg"
 	}
-	if &f.Spec.Dataset == nil {
-		f.Spec.Dataset = "cifar10"
+	if f.Spec.Dataset == nil {
+		*f.Spec.Dataset = "cifar10"
 	}
-	if &f.Spec.Index == nil {
-		f.Spec.Index = "0"
+	if f.Spec.Index == nil {
+		*f.Spec.Index = "0"
 	}
 }
 
@@ -103,12 +103,12 @@ func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
 
 	compile := regexp.MustCompile(pattern)
 	if &f.Spec.EdgeBased != nil {
-		if !compile.MatchString(f.Spec.EdgeBased) {
+		if !compile.MatchString(*f.Spec.EdgeBased) {
 			return nil, errors.New("invalid new edgeBased, must be True or False")
 		}
 	}
 	if &f.Spec.Offload != nil {
-		if !compile.MatchString(f.Spec.Offload) {
+		if !compile.MatchString(*f.Spec.Offload) {
 			return nil, errors.New("invalid new offload, must be True or False")
 		}
 	}
@@ -152,13 +152,13 @@ func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 
 	compile := regexp.MustCompile(pattern)
 	if &f.Spec.EdgeBased != nil {
-		if !compile.MatchString(f.Spec.EdgeBased) {
-			return nil, errors.New("invalid new edgeBased, must be True or False")
+		if !compile.MatchString(*f.Spec.EdgeBased) {
+			return nil, errors.New("invalid edgeBased, must be True or False")
 		}
 	}
 	if &f.Spec.Offload != nil {
-		if !compile.MatchString(f.Spec.Offload) {
-			return nil, errors.New("invalid new offload, must be True or False")
+		if !compile.MatchString(*f.Spec.Offload) {
+			return nil, errors.New("invalid offload, must be True or False")
 		}
 	}
 	return nil, nil

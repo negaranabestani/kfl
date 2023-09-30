@@ -32,25 +32,25 @@ type FLClusterSpec struct {
 	// +kubebuilder:validation:Optional
 	EdgeServer *Device `json:"edgeServer,omitempty"`
 	EdgeClient Device  `json:"edgeClient"`
-	Dataset    string  `json:"dataset"`
-	ModelName  string  `json:"modelName"`
+	Dataset    *string `json:"dataset"`
+	ModelName  *string `json:"modelName"`
 	//options
 	// +kubebuilder:validation:Optional
-	Aggegation string `json:"aggegation,omitempty"`
+	Aggegation *string `json:"aggegation,omitempty"`
 	// +kubebuilder:validation:Optional
-	EdgeBased string `json:"edgeBased,omitempty"`
+	EdgeBased *string `json:"edgeBased,omitempty"`
 	// +kubebuilder:validation:Optional
-	Clustering string `json:"clustering,omitempty"`
+	Clustering *string `json:"clustering,omitempty"`
 	// +kubebuilder:validation:Optional
-	Splitting string `json:"splitting,omitempty"`
+	Splitting *string `json:"splitting,omitempty"`
 	// +kubebuilder:validation:Optional
-	Offload string `json:"offload,omitempty"`
+	Offload *string `json:"offload,omitempty"`
 	// +kubebuilder:validation:Optional
-	DatasetLink string `json:"datasetLink,omitempty"`
+	DatasetLink *string `json:"datasetLink,omitempty"`
 	// +kubebuilder:validation:Optional
-	ModelLink string `json:"modelLink,omitempty"`
+	ModelLink *string `json:"modelLink,omitempty"`
 	// +kubebuilder:validation:Optional
-	Index string `json:"index,omitempty"`
+	Index *string `json:"index,omitempty"`
 }
 
 type Device struct {
