@@ -43,31 +43,41 @@ var _ webhook.Defaulter = &FLCluster{}
 func (f *FLCluster) Default() {
 	flclusterlog.Info("default", "name", f.Name)
 	if f.Spec.EdgeServer != nil {
-		*f.Spec.EdgeBased = "True"
+		v := "True"
+		f.Spec.EdgeBased = &v
 	} else if f.Spec.EdgeBased == nil {
-		*f.Spec.EdgeBased = "False"
+		v := "False"
+		f.Spec.EdgeBased = &v
 	}
 	if *f.Spec.Splitting != "none_splitting" {
-		*f.Spec.Offload = "True"
+		v := "True"
+		f.Spec.Offload = &v
 	} else if f.Spec.Splitting == nil {
-		*f.Spec.Splitting = "none_splitting"
+		v := "none_splitting"
+		f.Spec.Splitting = &v
 	} else if f.Spec.Offload == nil {
-		*f.Spec.Offload = "False"
+		v := "False"
+		f.Spec.Offload = &v
 	}
 	if f.Spec.Aggegation == nil {
-		*f.Spec.Aggegation = "fed_avg"
+		v := "fed_avg"
+		f.Spec.Aggegation = &v
 	}
 	if f.Spec.Clustering == nil {
-		*f.Spec.Clustering = "none_clustering"
+		v := "none_clustering"
+		f.Spec.Clustering = &v
 	}
 	if f.Spec.ModelName == nil {
-		*f.Spec.ModelName = "vgg"
+		v := "vgg"
+		f.Spec.ModelName = &v
 	}
 	if f.Spec.Dataset == nil {
-		*f.Spec.Dataset = "cifar10"
+		v := "cifar10"
+		f.Spec.Dataset = &v
 	}
 	if f.Spec.Index == nil {
-		*f.Spec.Index = "0"
+		v := "0"
+		f.Spec.Index = &v
 	}
 }
 
