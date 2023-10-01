@@ -49,12 +49,12 @@ func (f *FLCluster) Default() {
 		v := "False"
 		f.Spec.EdgeBased = &v
 	}
-	if *f.Spec.Splitting != "none_splitting" {
-		v := "True"
-		f.Spec.Offload = &v
-	} else if f.Spec.Splitting == nil {
+	if f.Spec.Splitting == nil {
 		v := "none_splitting"
 		f.Spec.Splitting = &v
+	} else if *f.Spec.Splitting != "none_splitting" {
+		v := "True"
+		f.Spec.Offload = &v
 	} else if f.Spec.Offload == nil {
 		v := "False"
 		f.Spec.Offload = &v
