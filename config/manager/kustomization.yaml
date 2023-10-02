@@ -5,4 +5,4 @@ kind: Kustomization
 images:
 - name: controller
   newName: negaranabestani/kfl
-  newTag: test47
+  newTag: test49

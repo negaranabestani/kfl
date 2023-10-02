@@ -10,8 +10,7 @@ spec:
       cpu: "0.5"
       memory: "1Gi"
   edgeClient:
-    replica: 1
-    resources:
-      cpu: "0.5"
-      memory: "1Gi"
-  
+    - replica: 1
+      resources:
+        cpu: "0.5"
+        memory: "1Gi"

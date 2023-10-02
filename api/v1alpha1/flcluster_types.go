@@ -30,10 +30,10 @@ type FLClusterSpec struct {
 
 	CentralServer Device `json:"centralServer"`
 	// +kubebuilder:validation:Optional
-	EdgeServer *Device `json:"edgeServer,omitempty"`
-	EdgeClient Device  `json:"edgeClient"`
-	Dataset    *string `json:"dataset"`
-	ModelName  *string `json:"modelName"`
+	EdgeServer []*Device `json:"edgeServer,omitempty"`
+	EdgeClient []Device  `json:"edgeClient"`
+	Dataset    *string   `json:"dataset"`
+	ModelName  *string   `json:"modelName"`
 	//options
 	// +kubebuilder:validation:Optional
 	Aggegation *string `json:"aggegation,omitempty"`

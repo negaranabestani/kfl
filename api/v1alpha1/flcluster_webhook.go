@@ -92,21 +92,25 @@ func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
 	if &f.Spec.CentralServer == nil {
 		return nil, errors.New("empty central server")
 	}
-	if &f.Spec.EdgeClient == nil {
+	if &f.Spec.EdgeClient == nil || len(f.Spec.EdgeClient) == 0 {
 		return nil, errors.New("empty edge client")
 	}
 	e1 := validateDevice(&f.Spec.CentralServer)
 	if e1 != nil {
 		return nil, errors.New("central server: " + e1.Error())
 	}
-	e2 := validateDevice(&f.Spec.EdgeClient)
-	if e2 != nil {
-		return nil, errors.New("edge client: " + e2.Error())
+	for i := 0; i < len(f.Spec.EdgeClient); i++ {
+		e2 := validateDevice(&f.Spec.EdgeClient[i])
+		if e2 != nil {
+			return nil, errors.New("edge client: " + e2.Error())
+		}
 	}
-	if f.Spec.EdgeServer != nil {
-		e3 := validateDevice(f.Spec.EdgeServer)
-		if e3 != nil {
-			return nil, errors.New("edge server: " + e3.Error())
+	if f.Spec.EdgeServer != nil && len(f.Spec.EdgeServer) != 0 {
+		for i := 0; i < len(f.Spec.EdgeServer); i++ {
+			e3 := validateDevice(f.Spec.EdgeServer[i])
+			if e3 != nil {
+				return nil, errors.New("edge server: " + e3.Error())
+			}
 		}
 	}
 	pattern := `^(True|False)$`
@@ -142,20 +146,24 @@ func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 	if !validateResourceUpdate(&f.Spec.CentralServer.Resources, &oldCluster.Spec.CentralServer.Resources) {
 		return nil, errors.New("invalid new central server resource")
 	}
-	e2 := validateDevice(&f.Spec.EdgeClient)
-	if e2 != nil {
-		return nil, errors.New("edge client: " + e2.Error())
-	}
-	if !validateResourceUpdate(&f.Spec.EdgeClient.Resources, &oldCluster.Spec.EdgeClient.Resources) {
-		return nil, errors.New("invalid new edge client resource")
-	}
-	if f.Spec.EdgeServer != nil {
-		e3 := validateDevice(f.Spec.EdgeServer)
-		if e3 != nil {
-			return nil, errors.New("edge server: " + e3.Error())
+	for i := 0; i < len(f.Spec.EdgeClient); i++ {
+		e2 := validateDevice(&f.Spec.EdgeClient[i])
+		if e2 != nil {
+			return nil, errors.New("edge client: " + e2.Error())
 		}
-		if !validateResourceUpdate(&f.Spec.EdgeServer.Resources, &oldCluster.Spec.EdgeServer.Resources) {
-			return nil, errors.New("invalid new edge server resource")
+		if !validateResourceUpdate(&f.Spec.EdgeClient[i].Resources, &oldCluster.Spec.EdgeClient[i].Resources) {
+			return nil, errors.New("invalid new edge client resource")
+		}
+	}
+	if f.Spec.EdgeServer != nil && len(f.Spec.EdgeServer) != 0 {
+		for i := 0; i < len(f.Spec.EdgeServer); i++ {
+			e3 := validateDevice(f.Spec.EdgeServer[i])
+			if e3 != nil {
+				return nil, errors.New("edge server: " + e3.Error())
+			}
+			if !validateResourceUpdate(&f.Spec.EdgeServer[i].Resources, &oldCluster.Spec.EdgeServer[i].Resources) {
+				return nil, errors.New("invalid new edge server resource")
+			}
 		}
 	}
 	pattern := `^(True|False)$`

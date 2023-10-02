@@ -65,43 +65,47 @@ spec:
               edgeBased:
                 type: string
               edgeClient:
-                properties:
-                  replica:
-                    format: int32
-                    type: integer
-                  resources:
-                    properties:
-                      cpu:
-                        type: string
-                      memory:
-                        type: string
-                    required:
-                    - cpu
-                    - memory
-                    type: object
-                required:
-                - replica
-                - resources
-                type: object
+                items:
+                  properties:
+                    replica:
+                      format: int32
+                      type: integer
+                    resources:
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      required:
+                      - cpu
+                      - memory
+                      type: object
+                  required:
+                  - replica
+                  - resources
+                  type: object
+                type: array
               edgeServer:
-                properties:
-                  replica:
-                    format: int32
-                    type: integer
-                  resources:
-                    properties:
-                      cpu:
-                        type: string
-                      memory:
-                        type: string
-                    required:
-                    - cpu
-                    - memory
-                    type: object
-                required:
-                - replica
-                - resources
-                type: object
+                items:
+                  properties:
+                    replica:
+                      format: int32
+                      type: integer
+                    resources:
+                      properties:
+                        cpu:
+                          type: string
+                        memory:
+                          type: string
+                      required:
+                      - cpu
+                      - memory
+                      type: object
+                  required:
+                  - replica
+                  - resources
+                  type: object
+                type: array
               index:
                 type: string
               modelLink:

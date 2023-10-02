@@ -100,17 +100,21 @@ func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc 
 	}
 
 	if flc.Spec.EdgeServer != nil {
-		err1 := r.createOrUpdateEdgeServer(ctx, flc)
-		if err1 != nil {
-			logger.Info("Error occurred during createOrUpdateEdgeServer")
-			return err1
+		for i := 0; i < len(flc.Spec.EdgeServer); i++ {
+			err1 := r.createOrUpdateEdgeServer(ctx, flc, i)
+			if err1 != nil {
+				logger.Info("Error occurred during createOrUpdateEdgeServer")
+				return err1
+			}
 		}
 	}
 
-	err2 := r.createOrUpdateEdgeClient(ctx, flc)
-	if err2 != nil {
-		logger.Info("Error occurred during createOrUpdateEdgeClient")
-		return err2
+	for i := 0; i < len(flc.Spec.EdgeClient); i++ {
+		err2 := r.createOrUpdateEdgeClient(ctx, flc, i)
+		if err2 != nil {
+			logger.Info("Error occurred during createOrUpdateEdgeClient")
+			return err2
+		}
 	}
 
 	return nil
