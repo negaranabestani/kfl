@@ -1,7 +1,7 @@
 apiVersion: kfl.aut.tech/v1alpha1
 kind: FLCluster
 metadata:
-  name: fl-cluster-classic-1-1
+  name: fl-cluster-1-1-1
   namespace: sample
 spec:
   centralServer:
@@ -19,4 +19,4 @@ spec:
     resources:
       cpu: "0.5"
       memory: "1Gi"
-  
+
