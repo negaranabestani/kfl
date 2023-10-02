@@ -112,12 +112,12 @@ func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
 	pattern := `^(True|False)$`
 
 	compile := regexp.MustCompile(pattern)
-	if &f.Spec.EdgeBased != nil {
+	if f.Spec.EdgeBased != nil {
 		if !compile.MatchString(*f.Spec.EdgeBased) {
 			return nil, errors.New("invalid new edgeBased, must be True or False")
 		}
 	}
-	if &f.Spec.Offload != nil {
+	if f.Spec.Offload != nil {
 		if !compile.MatchString(*f.Spec.Offload) {
 			return nil, errors.New("invalid new offload, must be True or False")
 		}
