@@ -35,8 +35,6 @@ func (f *FLCluster) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		Complete()
 }
 
-// TODO(user): EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-
 //+kubebuilder:webhook:path=/mutate-kfl-aut-tech-v1alpha1-flcluster,mutating=true,failurePolicy=fail,sideEffects=None,groups=kfl.aut.tech,resources=flclusters,verbs=create;update,versions=v1alpha1,name=mflcluster.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Defaulter = &FLCluster{}
@@ -44,10 +42,45 @@ var _ webhook.Defaulter = &FLCluster{}
 // Default implements webhook.Defaulter so a webhook will be registered for the type
 func (f *FLCluster) Default() {
 	flclusterlog.Info("default", "name", f.Name)
-
+	if f.Spec.EdgeServer != nil {
+		v := "True"
+		f.Spec.EdgeBased = &v
+	} else if f.Spec.EdgeBased == nil {
+		v := "False"
+		f.Spec.EdgeBased = &v
+	}
+	if f.Spec.Splitting == nil {
+		v := "none_splitting"
+		f.Spec.Splitting = &v
+	} else if *f.Spec.Splitting != "none_splitting" {
+		v := "True"
+		f.Spec.Offload = &v
+	} else if f.Spec.Offload == nil {
+		v := "False"
+		f.Spec.Offload = &v
+	}
+	if f.Spec.Aggegation == nil {
+		v := "fed_avg"
+		f.Spec.Aggegation = &v
+	}
+	if f.Spec.Clustering == nil {
+		v := "none_clustering"
+		f.Spec.Clustering = &v
+	}
+	if f.Spec.ModelName == nil {
+		v := "vgg"
+		f.Spec.ModelName = &v
+	}
+	if f.Spec.Dataset == nil {
+		v := "cifar10"
+		f.Spec.Dataset = &v
+	}
+	if f.Spec.Index == nil {
+		v := "0"
+		f.Spec.Index = &v
+	}
 }
 
-// TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
 //+kubebuilder:webhook:path=/validate-kfl-aut-tech-v1alpha1-flcluster,mutating=false,failurePolicy=fail,sideEffects=None,groups=kfl.aut.tech,resources=flclusters,verbs=create;update,versions=v1alpha1,name=vflcluster.kb.io,admissionReviewVersions=v1
 
 var _ webhook.Validator = &FLCluster{}
@@ -74,6 +107,19 @@ func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
 		e3 := validateDevice(f.Spec.EdgeServer)
 		if e3 != nil {
 			return nil, errors.New("edge server: " + e3.Error())
+		}
+	}
+	pattern := `^(True|False)$`
+
+	compile := regexp.MustCompile(pattern)
+	if f.Spec.EdgeBased != nil {
+		if !compile.MatchString(*f.Spec.EdgeBased) {
+			return nil, errors.New("invalid new edgeBased, must be True or False")
+		}
+	}
+	if f.Spec.Offload != nil {
+		if !compile.MatchString(*f.Spec.Offload) {
+			return nil, errors.New("invalid new offload, must be True or False")
 		}
 	}
 	return nil, nil
@@ -112,6 +158,19 @@ func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 			return nil, errors.New("invalid new edge server resource")
 		}
 	}
+	pattern := `^(True|False)$`
+
+	compile := regexp.MustCompile(pattern)
+	if f.Spec.EdgeBased != nil {
+		if !compile.MatchString(*f.Spec.EdgeBased) {
+			return nil, errors.New("invalid edgeBased, must be True or False")
+		}
+	}
+	if f.Spec.Offload != nil {
+		if !compile.MatchString(*f.Spec.Offload) {
+			return nil, errors.New("invalid offload, must be True or False")
+		}
+	}
 	return nil, nil
 }
 
@@ -119,7 +178,6 @@ func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 func (f *FLCluster) ValidateDelete() (admission.Warnings, error) {
 	flclusterlog.Info("validate delete", "name", f.Name)
 
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil, nil
 }
 func validateDevice(d *Device) error {

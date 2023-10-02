@@ -34,6 +34,9 @@ spec:
           spec:
             description: FLClusterSpec defines the desired state of FLCluster
             properties:
+              aggegation:
+                description: options
+                type: string
               centralServer:
                 properties:
                   replica:
@@ -53,7 +56,13 @@ spec:
                 - replica
                 - resources
                 type: object
+              clustering:
+                type: string
               dataset:
+                type: string
+              datasetLink:
+                type: string
+              edgeBased:
                 type: string
               edgeClient:
                 properties:
@@ -93,7 +102,15 @@ spec:
                 - replica
                 - resources
                 type: object
+              index:
+                type: string
+              modelLink:
+                type: string
               modelName:
+                type: string
+              offload:
+                type: string
+              splitting:
                 type: string
             required:
             - centralServer
