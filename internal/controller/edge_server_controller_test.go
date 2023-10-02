@@ -25,11 +25,13 @@ func edgeServerCreateOrUpdateTest(t *testing.T) {
 			Namespace: "sample",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			EdgeServer: &v1alpha1.Device{
-				Replica: 1,
-				Resources: v1alpha1.Resources{
-					Cpu:    "1000m",
-					Memory: "5Gi",
+			EdgeServer: []*v1alpha1.Device{
+				{
+					Replica: 1,
+					Resources: v1alpha1.Resources{
+						Cpu:    "1000m",
+						Memory: "5Gi",
+					},
 				},
 			},
 		},
@@ -38,13 +40,13 @@ func edgeServerCreateOrUpdateTest(t *testing.T) {
 		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
 		Scheme: scheme,
 	}
-	err := r.createOrUpdateEdgeServer(context.Background(), flCluster)
+	err := r.createOrUpdateEdgeServer(context.Background(), flCluster, 0)
 	if err != nil {
 		t.Fatalf("failed to create or update edge server")
 	}
 	deployment := &appsv1.Deployment{}
 	err1 := r.Get(context.Background(), client.ObjectKey{
-		Name:      flCluster.Name + "-" + edgeServer,
+		Name:      flCluster.Name + "-" + edgeServer + "0",
 		Namespace: flCluster.Namespace,
 	}, deployment)
 	if err1 != nil {
@@ -52,7 +54,7 @@ func edgeServerCreateOrUpdateTest(t *testing.T) {
 	}
 	service := &corev1.Service{}
 	err2 := r.Get(context.Background(), client.ObjectKey{
-		Name:      flCluster.Name + "-" + edgeServer,
+		Name:      flCluster.Name + "-" + edgeServer + "0",
 		Namespace: flCluster.Namespace,
 	}, service)
 	if err2 != nil {
@@ -72,11 +74,13 @@ func DesiredEdgeServerDeploymentTest(t *testing.T) {
 			Namespace: "sample",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			EdgeServer: &v1alpha1.Device{
-				Replica: 1,
-				Resources: v1alpha1.Resources{
-					Cpu:    "1000m",
-					Memory: "5Gi",
+			EdgeServer: []*v1alpha1.Device{
+				{
+					Replica: 1,
+					Resources: v1alpha1.Resources{
+						Cpu:    "1000m",
+						Memory: "5Gi",
+					},
 				},
 			},
 		},
@@ -85,7 +89,7 @@ func DesiredEdgeServerDeploymentTest(t *testing.T) {
 		Client: fake.NewClientBuilder().WithScheme(scheme).WithObjects(flCluster).Build(),
 		Scheme: scheme,
 	}
-	expectedName := flCluster.Name + "-" + edgeServer
+	expectedName := flCluster.Name + "-" + edgeServer + "0"
 	expectedNamespace := flCluster.Namespace
 	expectedResource := v1alpha1.Resources{
 		Cpu:    "1000m",
@@ -94,9 +98,10 @@ func DesiredEdgeServerDeploymentTest(t *testing.T) {
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
 		"app":     edgeServerSelectorApp,
+		"device":  edgeServer + "0",
 	}
-	expectedContainerName := flCluster.Name + "-" + edgeServer
-	deployment, err := r.desiredEdgeServerDeployment(flCluster)
+	expectedContainerName := flCluster.Name + "-" + edgeServer + "0"
+	deployment, err := r.desiredEdgeServerDeployment(flCluster, 0)
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, deployment.Name)
 	assert.Equal(t, expectedNamespace, deployment.Namespace)
@@ -123,11 +128,13 @@ func DesiredEdgeServerServiceTest(t *testing.T) {
 			Namespace: "sample",
 		},
 		Spec: v1alpha1.FLClusterSpec{
-			EdgeServer: &v1alpha1.Device{
-				Replica: 1,
-				Resources: v1alpha1.Resources{
-					Cpu:    "1000m",
-					Memory: "5Gi",
+			EdgeServer: []*v1alpha1.Device{
+				{
+					Replica: 1,
+					Resources: v1alpha1.Resources{
+						Cpu:    "1000m",
+						Memory: "5Gi",
+					},
 				},
 			},
 		},
@@ -137,14 +144,15 @@ func DesiredEdgeServerServiceTest(t *testing.T) {
 		Scheme: scheme,
 	}
 
-	expectedName := flCluster.Name + "-" + edgeServer
+	expectedName := flCluster.Name + "-" + edgeServer + "0"
 	expectedNamespace := flCluster.Namespace
 	expectedLabels := map[string]string{
 		"cluster": flCluster.Name,
 		"app":     edgeServerSelectorApp,
+		"device":  edgeServer + "0",
 	}
 
-	service, err := r.desiredEdgeServerService(flCluster)
+	service, err := r.desiredEdgeServerService(flCluster, 0)
 
 	assert.Nil(t, err)
 	assert.Equal(t, expectedName, service.Name)

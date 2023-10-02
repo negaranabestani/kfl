@@ -106,10 +106,20 @@ func (in *FLClusterSpec) DeepCopyInto(out *FLClusterSpec) {
 	out.CentralServer = in.CentralServer
 	if in.EdgeServer != nil {
 		in, out := &in.EdgeServer, &out.EdgeServer
-		*out = new(Device)
-		**out = **in
+		*out = make([]*Device, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(Device)
+				**out = **in
+			}
+		}
 	}
-	out.EdgeClient = in.EdgeClient
+	if in.EdgeClient != nil {
+		in, out := &in.EdgeClient, &out.EdgeClient
+		*out = make([]Device, len(*in))
+		copy(*out, *in)
+	}
 	if in.Dataset != nil {
 		in, out := &in.Dataset, &out.Dataset
 		*out = new(string)
