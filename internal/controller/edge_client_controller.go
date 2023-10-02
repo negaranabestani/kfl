@@ -12,6 +12,7 @@ import (
 	"reflect"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"strconv"
 )
 
 const (
@@ -83,12 +84,12 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 	resources, _ := utils.ResourceRequirements(cluster.Spec.EdgeClient[i].Resources)
 	deploymentTemplate := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      cluster.Name + "-" + EdgeClient + string(rune(i)),
+			Name:      cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
 			Namespace: cluster.Namespace,
 			Labels: map[string]string{
 				"cluster": cluster.Name,
 				"app":     EdgeClient,
-				"device":  EdgeClient + string(rune(i)),
+				"device":  EdgeClient + string(strconv.Itoa(i)),
 			},
 		},
 		Spec: appsv1.DeploymentSpec{
@@ -97,7 +98,7 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 				MatchLabels: map[string]string{
 					"cluster": cluster.Name,
 					"app":     EdgeClient,
-					"device":  EdgeClient + string(rune(i)),
+					"device":  EdgeClient + string(strconv.Itoa(i)),
 				},
 			},
 			Template: corev1.PodTemplateSpec{
@@ -105,7 +106,7 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 					Labels: map[string]string{
 						"cluster": cluster.Name,
 						"app":     EdgeClient,
-						"device":  EdgeClient + string(rune(i)),
+						"device":  EdgeClient + string(strconv.Itoa(i)),
 					},
 				},
 				Spec: corev1.PodSpec{
@@ -141,7 +142,7 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 					},
 					Containers: []corev1.Container{
 						{
-							Name:  cluster.Name + "-" + EdgeClient + string(rune(i)),
+							Name:  cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
 							Image: EdgeClientImage,
 							Ports: []corev1.ContainerPort{
 								{
@@ -167,11 +168,11 @@ func (r *FLClusterReconciler) desiredEdgeClientService(cluster *v1alpha1.FLClust
 	service := &corev1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: cluster.Namespace,
-			Name:      cluster.Name + "-" + EdgeClient + string(rune(i)),
+			Name:      cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
 			Labels: map[string]string{
 				"cluster": cluster.Name,
 				"app":     EdgeClientSelectorApp,
-				"device":  EdgeClient + string(rune(i)),
+				"device":  EdgeClient + string(strconv.Itoa(i)),
 			},
 		},
 		Spec: corev1.ServiceSpec{
@@ -185,7 +186,7 @@ func (r *FLClusterReconciler) desiredEdgeClientService(cluster *v1alpha1.FLClust
 			Selector: map[string]string{
 				"cluster": cluster.Name,
 				"app":     EdgeClientSelectorApp,
-				"device":  EdgeClient + string(rune(i)),
+				"device":  EdgeClient + string(strconv.Itoa(i)),
 			},
 		},
 	}
