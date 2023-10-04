@@ -18,10 +18,11 @@ import (
 const (
 	edgeServer                  = "edge-server"
 	edgeServerSelectorApp       = "edge-server"
-	edgeServerImage             = "kennethreitz/httpbin"
-	edgeServerContainerPort     = 9002
+	edgeServerImage             = "negaranabestani/fake-edge:v1"
+	edgePort                    = 9000
 	edgeServerContainerPortName = "httpbin"
-	edgeServerServicePort       = 9002
+	EdgeServerBaseCommand       = "python3 edge-server.py"
+	//edgeServerServicePort       = 9002
 )
 
 func (r *FLClusterReconciler) createOrUpdateEdgeServer(ctx context.Context, cluster *v1alpha1.FLCluster, i int) error {
@@ -143,10 +144,19 @@ func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCl
 						{
 							Name:  cluster.Name + "-" + edgeServer + strconv.Itoa(i),
 							Image: edgeServerImage,
+							Command: []string{
+								EdgeServerBaseCommand,
+								"-i",
+								strconv.Itoa(i),
+								"-ns",
+								cluster.Namespace,
+								"-cn",
+								cluster.Name,
+							},
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          edgeServerContainerPortName,
-									ContainerPort: edgeServerContainerPort,
+									ContainerPort: int32(edgePort + i),
 								},
 							},
 							Resources: *resources,
@@ -177,8 +187,8 @@ func (r *FLClusterReconciler) desiredEdgeServerService(cluster *v1alpha1.FLClust
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",
-					Port:       int32(edgeServerServicePort),
-					TargetPort: intstr.FromString("default"),
+					Port:       int32(edgePort + i),
+					TargetPort: intstr.FromString(edgeServerContainerPortName),
 				},
 			},
 			Selector: map[string]string{

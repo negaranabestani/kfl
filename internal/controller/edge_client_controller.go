@@ -18,10 +18,11 @@ import (
 const (
 	EdgeClient                  = "edge-client"
 	EdgeClientSelectorApp       = "edge-client"
-	EdgeClientImage             = "curlimages/curl"
-	EdgeClientContainerPort     = 9001
-	EdgeClientContainerPortName = "httpbin"
-	EdgeClientServicePort       = 9001
+	EdgeClientImage             = "negaranabestani/fake-client:v1"
+	EdgeClientBaseCommand       = "python3 edge-client.py"
+	EdgeClientPort              = 5000
+	EdgeClientContainerPortName = "http"
+	//EdgeClientServicePort       = 9001
 )
 
 func (r *FLClusterReconciler) createOrUpdateEdgeClient(ctx context.Context, cluster *v1alpha1.FLCluster, i int) error {
@@ -144,10 +145,21 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 						{
 							Name:  cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
 							Image: EdgeClientImage,
+							Command: []string{
+								EdgeClientBaseCommand,
+								"-i",
+								strconv.Itoa(i),
+								"-ns",
+								cluster.Namespace,
+								"-cn",
+								cluster.Name,
+								"-e",
+								*cluster.Spec.EdgeBased,
+							},
 							Ports: []corev1.ContainerPort{
 								{
-									Name:          "http",
-									ContainerPort: EdgeClientContainerPort,
+									Name:          EdgeClientContainerPortName,
+									ContainerPort: int32(EdgeClientPort + i),
 								},
 							},
 							Resources: *resources,
@@ -179,8 +191,8 @@ func (r *FLClusterReconciler) desiredEdgeClientService(cluster *v1alpha1.FLClust
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",
-					Port:       EdgeClientServicePort,
-					TargetPort: intstr.FromString("default"),
+					Port:       int32(EdgeClientPort + i),
+					TargetPort: intstr.FromString(EdgeClientContainerPortName),
 				},
 			},
 			Selector: map[string]string{

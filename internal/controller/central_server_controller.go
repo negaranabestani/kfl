@@ -19,11 +19,11 @@ import (
 const (
 	CentralServer                  = "central-server"
 	CentralServerSelectorApp       = "central-server"
-	CentralServerImage             = "kennethreitz/httpbin"
+	CentralServerImage             = "negaranabestani/fake-server:v1"
 	CentralServerContainerPort     = 9000
-	CentralServerContainerPortName = "httpbin"
-	centralServerServicePort       = 9000
+	CentralServerContainerPortName = "centralserverport"
 	centralServerMountPath         = "/results"
+	CentralServerBaseCommand       = "python3 central-server.py"
 )
 
 func (r *FLClusterReconciler) createOrUpdateCentralServer(ctx context.Context, cluster *v1alpha1.FLCluster) error {
@@ -189,6 +189,9 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 						{
 							Name:  cluster.Name + "-" + CentralServer,
 							Image: CentralServerImage,
+							Command: []string{
+								CentralServerBaseCommand,
+							},
 							Ports: []corev1.ContainerPort{
 								{
 									Name:          CentralServerContainerPortName,
@@ -238,8 +241,8 @@ func (r *FLClusterReconciler) desiredCentralServerService(cluster *v1alpha1.FLCl
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",
-					Port:       int32(centralServerServicePort),
-					TargetPort: intstr.FromString("default"),
+					Port:       int32(CentralServerContainerPort),
+					TargetPort: intstr.FromString(CentralServerContainerPortName),
 				},
 			},
 			Selector: map[string]string{
