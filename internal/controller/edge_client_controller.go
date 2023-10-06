@@ -143,8 +143,9 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 					},
 					Containers: []corev1.Container{
 						{
-							Name:  cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
-							Image: EdgeClientImage,
+							Name:            cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
+							Image:           EdgeClientImage,
+							ImagePullPolicy: corev1.PullAlways,
 							Command: []string{
 								"python3",
 								EdgeClientBaseCommand,

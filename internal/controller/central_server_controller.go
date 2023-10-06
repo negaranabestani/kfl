@@ -187,8 +187,9 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 					},
 					Containers: []corev1.Container{
 						{
-							Name:  cluster.Name + "-" + CentralServer,
-							Image: CentralServerImage,
+							Name:            cluster.Name + "-" + CentralServer,
+							Image:           CentralServerImage,
+							ImagePullPolicy: corev1.PullAlways,
 							Command: []string{
 								"python3",
 								CentralServerBaseCommand,
