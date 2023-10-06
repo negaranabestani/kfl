@@ -191,6 +191,10 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 							Image: CentralServerImage,
 							Command: []string{
 								CentralServerBaseCommand,
+								"-ns",
+								cluster.Namespace,
+								"-cn",
+								cluster.Name,
 							},
 							Ports: []corev1.ContainerPort{
 								{
