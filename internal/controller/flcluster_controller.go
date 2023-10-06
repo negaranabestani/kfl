@@ -79,7 +79,7 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	myFinalizerName := "kfl.aut.tech/finalizer"
 
 	// examine DeletionTimestamp to determine if object is under deletion
-	if flc.ObjectMeta.DeletionTimestamp.IsZero() {
+	if flc.ObjectMeta.DeletionTimestamp == nil {
 		// The object is not being deleted, so if it does not have our finalizer,
 		// then lets add the finalizer and update the object. This is equivalent
 		// registering our finalizer.
