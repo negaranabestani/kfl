@@ -21,7 +21,7 @@ const (
 	CentralServerSelectorApp       = "central-server"
 	CentralServerImage             = "negaranabestani/fake-server:v1"
 	CentralServerContainerPort     = 9000
-	CentralServerContainerPortName = "centralserverport"
+	CentralServerContainerPortName = "serverport"
 	centralServerMountPath         = "/results"
 	CentralServerBaseCommand       = "python3 central-server.py"
 )
