@@ -139,7 +139,7 @@ func (r *FLClusterReconciler) deleteComponents(ctx context.Context, flc *kflv1al
 		logger.Info(err9.Error())
 		return err9
 	}
-	if err := r.Delete(ctx, existingPV, nil); err != nil {
+	if err := r.Delete(ctx, existingPV); err != nil {
 		return err
 	}
 
@@ -153,7 +153,7 @@ func (r *FLClusterReconciler) deleteComponents(ctx context.Context, flc *kflv1al
 		logger.Info(err3.Error())
 		return err3
 	}
-	if err := r.Delete(ctx, existingPVC, nil); err != nil {
+	if err := r.Delete(ctx, existingPVC); err != nil {
 		return err
 	}
 
@@ -167,8 +167,14 @@ func (r *FLClusterReconciler) deleteComponents(ctx context.Context, flc *kflv1al
 		logger.Info(err5.Error())
 		return err5
 	}
-	if err := r.Delete(ctx, existingSC, nil); err != nil {
+	if err := r.Delete(ctx, existingSC); err != nil {
 		return err
+	}
+
+	err6 := r.Status().Update(ctx, flc)
+	if err6 != nil {
+		logger.Info(err6.Error())
+		return err6
 	}
 	return nil
 }
