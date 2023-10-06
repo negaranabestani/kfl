@@ -26,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"reflect"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -76,39 +75,39 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
-	myFinalizerName := "kfl.aut.tech/finalizer"
-
-	// examine DeletionTimestamp to determine if object is under deletion
-	if flc.ObjectMeta.DeletionTimestamp == nil {
-		// The object is not being deleted, so if it does not have our finalizer,
-		// then lets add the finalizer and update the object. This is equivalent
-		// registering our finalizer.
-		if !controllerutil.ContainsFinalizer(&flc, myFinalizerName) {
-			controllerutil.AddFinalizer(&flc, myFinalizerName)
-			if err := r.Update(ctx, &flc); err != nil {
-				return ctrl.Result{}, err
-			}
-		}
-	} else {
-		// The object is being deleted
-		if controllerutil.ContainsFinalizer(&flc, myFinalizerName) {
-			// our finalizer is present, so lets handle any external dependency
-			if err := r.deleteComponents(ctx, &flc, logger); err != nil {
-				// if fail to delete the external dependency here, return with error
-				// so that it can be retried
-				return ctrl.Result{}, err
-			}
-
-			// remove our finalizer from the list and update it.
-			controllerutil.RemoveFinalizer(&flc, myFinalizerName)
-			if err := r.Update(ctx, &flc); err != nil {
-				return ctrl.Result{}, err
-			}
-		}
-
-		// Stop reconciliation as the item is being deleted
-		return ctrl.Result{}, nil
-	}
+	//myFinalizerName := "kfl.aut.tech/finalizer"
+	//
+	//// examine DeletionTimestamp to determine if object is under deletion
+	//if flc.ObjectMeta.DeletionTimestamp == nil {
+	//	// The object is not being deleted, so if it does not have our finalizer,
+	//	// then lets add the finalizer and update the object. This is equivalent
+	//	// registering our finalizer.
+	//	if !controllerutil.ContainsFinalizer(&flc, myFinalizerName) {
+	//		controllerutil.AddFinalizer(&flc, myFinalizerName)
+	//		if err := r.Update(ctx, &flc); err != nil {
+	//			return ctrl.Result{}, err
+	//		}
+	//	}
+	//} else {
+	//	// The object is being deleted
+	//	if controllerutil.ContainsFinalizer(&flc, myFinalizerName) {
+	//		// our finalizer is present, so lets handle any external dependency
+	//		if err := r.deleteComponents(ctx, &flc, logger); err != nil {
+	//			// if fail to delete the external dependency here, return with error
+	//			// so that it can be retried
+	//			return ctrl.Result{}, err
+	//		}
+	//
+	//		// remove our finalizer from the list and update it.
+	//		controllerutil.RemoveFinalizer(&flc, myFinalizerName)
+	//		if err := r.Update(ctx, &flc); err != nil {
+	//			return ctrl.Result{}, err
+	//		}
+	//	}
+	//
+	//	// Stop reconciliation as the item is being deleted
+	//	return ctrl.Result{}, nil
+	//}
 
 	requestArray := strings.Split(fmt.Sprint(req), "/")
 	requestName := requestArray[1]
