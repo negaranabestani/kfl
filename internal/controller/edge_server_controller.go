@@ -18,10 +18,10 @@ import (
 const (
 	edgeServer                  = "edge-server"
 	edgeServerSelectorApp       = "edge-server"
-	edgeServerImage             = "negaranabestani/fake-edge:v1"
+	edgeServerImage             = "negaranabestani/fake-edge:v2"
 	edgePort                    = 9000
 	edgeServerContainerPortName = "httpbin"
-	EdgeServerBaseCommand       = "python3 edge-server.py"
+	EdgeServerBaseCommand       = "edge-server.py"
 	//edgeServerServicePort       = 9002
 )
 
@@ -145,6 +145,7 @@ func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCl
 							Name:  cluster.Name + "-" + edgeServer + strconv.Itoa(i),
 							Image: edgeServerImage,
 							Command: []string{
+								"python3",
 								EdgeServerBaseCommand,
 								"-i",
 								strconv.Itoa(i),

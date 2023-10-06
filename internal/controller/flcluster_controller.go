@@ -18,12 +18,15 @@ package controller
 
 import (
 	"context"
+	defulterrors "errors"
 	"fmt"
 	"github.com/go-logr/logr"
+	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"reflect"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -73,6 +76,40 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 		return ctrl.Result{}, err
 	}
 
+	myFinalizerName := "kfl.aut.tech/finalizer"
+
+	// examine DeletionTimestamp to determine if object is under deletion
+	if flc.ObjectMeta.DeletionTimestamp.IsZero() {
+		// The object is not being deleted, so if it does not have our finalizer,
+		// then lets add the finalizer and update the object. This is equivalent
+		// registering our finalizer.
+		if !controllerutil.ContainsFinalizer(&flc, myFinalizerName) {
+			controllerutil.AddFinalizer(&flc, myFinalizerName)
+			if err := r.Update(ctx, &flc); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+	} else {
+		// The object is being deleted
+		if controllerutil.ContainsFinalizer(&flc, myFinalizerName) {
+			// our finalizer is present, so lets handle any external dependency
+			if err := r.deleteComponents(ctx, &flc, logger); err != nil {
+				// if fail to delete the external dependency here, return with error
+				// so that it can be retried
+				return ctrl.Result{}, err
+			}
+
+			// remove our finalizer from the list and update it.
+			controllerutil.RemoveFinalizer(&flc, myFinalizerName)
+			if err := r.Update(ctx, &flc); err != nil {
+				return ctrl.Result{}, err
+			}
+		}
+
+		// Stop reconciliation as the item is being deleted
+		return ctrl.Result{}, nil
+	}
+
 	requestArray := strings.Split(fmt.Sprint(req), "/")
 	requestName := requestArray[1]
 
@@ -87,6 +124,54 @@ func (r *FLClusterReconciler) Reconcile(ctx context.Context, req ctrl.Request) (
 	return ctrl.Result{}, nil
 }
 
+func (r *FLClusterReconciler) deleteComponents(ctx context.Context, flc *kflv1alpha1.FLCluster, logger logr.Logger) error {
+	//deletePolicy := metav1.DeletePropagationForeground
+	//deleteOptions := metav1.DeleteOptions{
+	//	PropagationPolicy: &deletePolicy,
+	//}
+	desiredPV, er8 := r.desiredCentralServerPV(flc)
+	if er8 != nil {
+		return defulterrors.New("delete: cannot fetch desired pv")
+	}
+	existingPV := &corev1.PersistentVolume{}
+	err9 := r.Get(ctx, client.ObjectKeyFromObject(desiredPV), existingPV)
+	if err9 != nil {
+		logger.Info(err9.Error())
+		return err9
+	}
+	if err := r.Delete(ctx, existingPV, nil); err != nil {
+		return err
+	}
+
+	desiredPVC, er0 := r.desiredCentralServerPVC(flc)
+	if er0 != nil {
+		return defulterrors.New("delete: cannot fetch desired pvc")
+	}
+	existingPVC := &corev1.PersistentVolumeClaim{}
+	err3 := r.Get(ctx, client.ObjectKeyFromObject(desiredPVC), existingPVC)
+	if err3 != nil {
+		logger.Info(err3.Error())
+		return err3
+	}
+	if err := r.Delete(ctx, existingPVC, nil); err != nil {
+		return err
+	}
+
+	desiredSC, er1 := r.desiredSC()
+	if er1 != nil {
+		return defulterrors.New("delete: cannot fetch desired SC")
+	}
+	existingSC := &v1.StorageClass{}
+	err5 := r.Get(ctx, client.ObjectKeyFromObject(desiredSC), existingSC)
+	if err5 != nil {
+		logger.Info(err5.Error())
+		return err5
+	}
+	if err := r.Delete(ctx, existingSC, nil); err != nil {
+		return err
+	}
+	return nil
+}
 func (r *FLClusterReconciler) createOrUpdateComponents(ctx context.Context, flc *kflv1alpha1.FLCluster, logger logr.Logger) error {
 	err0 := r.createOrUpdateSC(ctx)
 	if err0 != nil {
