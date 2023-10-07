@@ -104,6 +104,8 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
+					Name:      cluster.Name + "-" + EdgeClient + string(strconv.Itoa(i)),
+					Namespace: cluster.Namespace,
 					Labels: map[string]string{
 						"cluster": cluster.Name,
 						"app":     EdgeClient,

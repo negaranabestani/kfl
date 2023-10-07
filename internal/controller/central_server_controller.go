@@ -159,6 +159,8 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
+					Name:      cluster.Name + "-" + CentralServer,
+					Namespace: cluster.Namespace,
 					Labels: map[string]string{
 						"cluster": cluster.Name,
 						"app":     CentralServer,
