@@ -49,8 +49,6 @@ type FLClusterSpec struct {
 	DatasetLink *string `json:"datasetLink,omitempty"`
 	// +kubebuilder:validation:Optional
 	ModelLink *string `json:"modelLink,omitempty"`
-	// +kubebuilder:validation:Optional
-	Index *string `json:"index,omitempty"`
 }
 
 type Device struct {

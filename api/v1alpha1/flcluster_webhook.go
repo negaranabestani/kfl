@@ -75,10 +75,6 @@ func (f *FLCluster) Default() {
 		v := "cifar10"
 		f.Spec.Dataset = &v
 	}
-	if f.Spec.Index == nil {
-		v := "0"
-		f.Spec.Index = &v
-	}
 }
 
 //+kubebuilder:webhook:path=/validate-kfl-aut-tech-v1alpha1-flcluster,mutating=false,failurePolicy=fail,sideEffects=None,groups=kfl.aut.tech,resources=flclusters,verbs=create;update,versions=v1alpha1,name=vflcluster.kb.io,admissionReviewVersions=v1
