@@ -18,7 +18,7 @@ import (
 const (
 	edgeServer                  = "edge-server"
 	edgeServerSelectorApp       = "edge-server"
-	edgeServerImage             = "negaranabestani/fake-edge:v2"
+	edgeServerImage             = "negaranabestani/fake-fed-flow:v1"
 	edgePort                    = 9000
 	edgeServerContainerPortName = "httpbin"
 	EdgeServerBaseCommand       = "edge-server.py"

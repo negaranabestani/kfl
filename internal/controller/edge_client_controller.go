@@ -18,7 +18,7 @@ import (
 const (
 	EdgeClient                  = "edge-client"
 	EdgeClientSelectorApp       = "edge-client"
-	EdgeClientImage             = "negaranabestani/fake-client:v2"
+	EdgeClientImage             = "negaranabestani/fake-fed-flow:v1"
 	EdgeClientBaseCommand       = "edge-client.py"
 	EdgeClientPort              = 5000
 	EdgeClientContainerPortName = "http"

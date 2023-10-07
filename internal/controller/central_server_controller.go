@@ -19,7 +19,7 @@ import (
 const (
 	CentralServer                  = "central-server"
 	CentralServerSelectorApp       = "central-server"
-	CentralServerImage             = "negaranabestani/fake-server:v2"
+	CentralServerImage             = "negaranabestani/fake-fed-flow:v1"
 	CentralServerContainerPort     = 9000
 	CentralServerContainerPortName = "serverport"
 	centralServerMountPath         = "/results"
