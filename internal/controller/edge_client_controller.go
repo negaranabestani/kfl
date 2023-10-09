@@ -113,7 +113,7 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 					},
 				},
 				Spec: corev1.PodSpec{
-					Hostname: cluster.Name + "-" + EdgeClient + strconv.Itoa(i) + "." + cluster.Namespace,
+					Hostname: cluster.Name + "-" + EdgeClient + strconv.Itoa(i) + "-" + cluster.Namespace,
 					Affinity: &corev1.Affinity{
 						PodAntiAffinity: &corev1.PodAntiAffinity{
 							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
