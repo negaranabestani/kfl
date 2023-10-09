@@ -167,12 +167,7 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 					},
 				},
 				Spec: corev1.PodSpec{
-					DNSPolicy: corev1.DNSNone,
-					DNSConfig: &corev1.PodDNSConfig{
-						Searches: []string{
-							cluster.Name + "-" + CentralServer + "." + cluster.Namespace,
-						},
-					},
+					Hostname: cluster.Name + "-" + CentralServer + "." + cluster.Namespace,
 					Affinity: &corev1.Affinity{
 						NodeAffinity: &corev1.NodeAffinity{
 							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.PreferredSchedulingTerm{

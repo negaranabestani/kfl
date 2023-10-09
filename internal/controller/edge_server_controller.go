@@ -112,12 +112,7 @@ func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCl
 					},
 				},
 				Spec: corev1.PodSpec{
-					DNSPolicy: corev1.DNSNone,
-					DNSConfig: &corev1.PodDNSConfig{
-						Searches: []string{
-							cluster.Name + "-" + edgeServer + strconv.Itoa(i) + "." + cluster.Namespace,
-						},
-					},
+					Hostname: cluster.Name + "-" + edgeServer + strconv.Itoa(i) + "." + cluster.Namespace,
 					Affinity: &corev1.Affinity{
 						PodAntiAffinity: &corev1.PodAntiAffinity{
 							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
