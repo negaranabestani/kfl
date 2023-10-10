@@ -39,6 +39,10 @@ spec:
                 type: string
               centralServer:
                 properties:
+                  allocation:
+                    items:
+                      type: integer
+                    type: array
                   replica:
                     format: int32
                     type: integer
@@ -67,6 +71,10 @@ spec:
               edgeClient:
                 items:
                   properties:
+                    allocation:
+                      items:
+                        type: integer
+                      type: array
                     replica:
                       format: int32
                       type: integer
@@ -88,6 +96,10 @@ spec:
               edgeServer:
                 items:
                   properties:
+                    allocation:
+                      items:
+                        type: integer
+                      type: array
                     replica:
                       format: int32
                       type: integer
@@ -106,8 +118,6 @@ spec:
                   - resources
                   type: object
                 type: array
-              index:
-                type: string
               modelLink:
                 type: string
               modelName:
@@ -140,6 +150,10 @@ spec:
                   properties:
                     edgeClient:
                       properties:
+                        allocation:
+                          items:
+                            type: integer
+                          type: array
                         replica:
                           format: int32
                           type: integer
@@ -159,6 +173,10 @@ spec:
                       type: object
                     edgeServer:
                       properties:
+                        allocation:
+                          items:
+                            type: integer
+                          type: array
                         replica:
                           format: int32
                           type: integer
