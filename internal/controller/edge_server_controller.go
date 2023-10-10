@@ -188,8 +188,6 @@ func (r *FLClusterReconciler) desiredEdgeServerService(cluster *v1alpha1.FLClust
 			},
 		},
 		Spec: corev1.ServiceSpec{
-			Type:         corev1.ServiceTypeExternalName,
-			ExternalName: cluster.Name + "-" + edgeServer + strconv.Itoa(i) + "." + cluster.Namespace,
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",

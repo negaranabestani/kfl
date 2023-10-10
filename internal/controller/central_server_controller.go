@@ -246,8 +246,6 @@ func (r *FLClusterReconciler) desiredCentralServerService(cluster *v1alpha1.FLCl
 			},
 		},
 		Spec: corev1.ServiceSpec{
-			Type:         corev1.ServiceTypeExternalName,
-			ExternalName: cluster.Name + "-" + CentralServer + "." + cluster.Namespace,
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",
