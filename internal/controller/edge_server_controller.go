@@ -112,7 +112,6 @@ func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCl
 					},
 				},
 				Spec: corev1.PodSpec{
-					Hostname: cluster.Name + "-" + edgeServer + strconv.Itoa(i) + "-" + cluster.Namespace,
 					Affinity: &corev1.Affinity{
 						PodAntiAffinity: &corev1.PodAntiAffinity{
 							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.WeightedPodAffinityTerm{
@@ -189,6 +188,8 @@ func (r *FLClusterReconciler) desiredEdgeServerService(cluster *v1alpha1.FLClust
 			},
 		},
 		Spec: corev1.ServiceSpec{
+			Type:         corev1.ServiceTypeExternalName,
+			ExternalName: cluster.Name + "-" + edgeServer + strconv.Itoa(i) + "." + cluster.Namespace,
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",

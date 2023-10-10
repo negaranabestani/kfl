@@ -167,7 +167,6 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 					},
 				},
 				Spec: corev1.PodSpec{
-					Hostname: cluster.Name + "-" + CentralServer + "-" + cluster.Namespace,
 					Affinity: &corev1.Affinity{
 						NodeAffinity: &corev1.NodeAffinity{
 							PreferredDuringSchedulingIgnoredDuringExecution: []corev1.PreferredSchedulingTerm{
@@ -247,6 +246,8 @@ func (r *FLClusterReconciler) desiredCentralServerService(cluster *v1alpha1.FLCl
 			},
 		},
 		Spec: corev1.ServiceSpec{
+			Type:         corev1.ServiceTypeExternalName,
+			ExternalName: cluster.Name + "-" + CentralServer + "." + cluster.Namespace,
 			Ports: []corev1.ServicePort{
 				{
 					Name:       "default",
