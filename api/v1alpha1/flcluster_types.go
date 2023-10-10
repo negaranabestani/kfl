@@ -52,10 +52,9 @@ type FLClusterSpec struct {
 }
 
 type Device struct {
-	Replica   int32     `json:"replica"`
-	Resources Resources `json:"resources"`
-	// +kubebuilder:validation:Optional
-	Allocation []int `json:"allocation,omitempty"`
+	Replica    int32     `json:"replica"`
+	Resources  Resources `json:"resources"`
+	Allocation []int     `json:"allocation"`
 }
 type Resources struct {
 	Memory string `json:"memory"`
