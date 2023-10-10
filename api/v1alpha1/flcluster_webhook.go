@@ -107,6 +107,9 @@ func (f *FLCluster) ValidateCreate() (admission.Warnings, error) {
 			if e3 != nil {
 				return nil, errors.New("edge server: " + e3.Error())
 			}
+			if f.Spec.EdgeServer[i].Allocation == nil || len(f.Spec.EdgeServer[i].Allocation) == 0 {
+				return nil, errors.New("edge server: allocation needed")
+			}
 		}
 	}
 	pattern := `^(True|False)$`
@@ -160,6 +163,9 @@ func (f *FLCluster) ValidateUpdate(old runtime.Object) (admission.Warnings, erro
 			if !validateResourceUpdate(&f.Spec.EdgeServer[i].Resources, &oldCluster.Spec.EdgeServer[i].Resources) {
 				return nil, errors.New("invalid new edge server resource")
 			}
+			if f.Spec.EdgeServer[i].Allocation == nil || len(f.Spec.EdgeServer[i].Allocation) == 0 {
+				return nil, errors.New("edge server: allocation needed")
+			}
 		}
 	}
 	pattern := `^(True|False)$`
@@ -193,6 +199,7 @@ func validateDevice(d *Device) error {
 	if !validateResource(&d.Resources) {
 		return errors.New("invalid resource")
 	}
+
 	return nil
 }
 func validateResource(r *Resources) bool {
