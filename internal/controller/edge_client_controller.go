@@ -159,6 +159,8 @@ func (r *FLClusterReconciler) desiredEdgeClientDeployment(cluster *v1alpha1.FLCl
 								cluster.Name,
 								"-e",
 								*cluster.Spec.EdgeBased,
+								"-cm",
+								strconv.Itoa(cluster.Spec.EdgeClient[i].Allocation[0]),
 							},
 							Ports: []corev1.ContainerPort{
 								{
