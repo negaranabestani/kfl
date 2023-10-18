@@ -14,6 +14,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"strconv"
 )
 
 const (
@@ -139,6 +140,10 @@ func (r *FLClusterReconciler) deleteCentralServer(ctx context.Context, cluster v
 }
 
 func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.FLCluster) (*appsv1.Deployment, error) {
+	w := strconv.Itoa(len(cluster.Spec.EdgeClient))
+	if *cluster.Spec.EdgeBased == "True" {
+		w = strconv.Itoa(len(cluster.Spec.EdgeServer))
+	}
 	resources, _ := utils.ResourceRequirements(cluster.Spec.CentralServer.Resources)
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -199,6 +204,10 @@ func (r *FLClusterReconciler) desiredCentralServerDeployment(cluster *v1alpha1.F
 								cluster.Namespace,
 								"-cn",
 								cluster.Name,
+								"-k",
+								strconv.Itoa(len(cluster.Spec.EdgeClient)),
+								"-w",
+								w,
 							},
 							Ports: []corev1.ContainerPort{
 								{
