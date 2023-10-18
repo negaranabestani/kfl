@@ -82,6 +82,10 @@ func (r *FLClusterReconciler) deleteEdgeServer(ctx context.Context, cluster v1al
 
 func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCluster, i int) (*appsv1.Deployment, error) {
 	resources, _ := utils.ResourceRequirements(cluster.Spec.EdgeServer[i].Resources)
+	em := strconv.Itoa(cluster.Spec.EdgeServer[i].Allocation[0])
+	for k := 1; k < len(cluster.Spec.EdgeServer[i].Allocation); i++ {
+		em = em + "," + strconv.Itoa(cluster.Spec.EdgeServer[i].Allocation[k])
+	}
 	dep := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      cluster.Name + "-" + edgeServer + strconv.Itoa(i),
@@ -156,6 +160,10 @@ func (r *FLClusterReconciler) desiredEdgeServerDeployment(cluster *v1alpha1.FLCl
 								cluster.Namespace,
 								"-cn",
 								cluster.Name,
+								"-k",
+								strconv.Itoa(len(cluster.Spec.EdgeClient)),
+								"-em",
+								em,
 							},
 							Ports: []corev1.ContainerPort{
 								{
