@@ -5,7 +5,7 @@ This project is developed to make configuration and management of Federated Lear
 
 ## Description
 Federeted Learning is a new distributed machine learning approach. So multiple parties contribute together to build up a machine learning model in a distributed manner. kfl operationalizes the configuration of FL clusters, and management of FL tasks on Kubernetes. 
-// TODO(user): description of FL enabler project
+It takes a yaml file containing the cluste information, based on that for each device a deployment and other kinds are generated and then the controller manages the resources.
 
 ## Getting Started
 You’ll need a Kubernetes cluster to run against. You can use [KIND](https://sigs.k8s.io/kind) to get a local cluster for testing, or run against a remote cluster.
